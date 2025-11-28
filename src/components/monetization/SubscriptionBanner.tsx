@@ -39,11 +39,11 @@ export function SubscriptionBanner() {
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                        <h3 className="font-bold text-lg mb-4">What's included:</h3>
+                        <h3 className="font-bold text-lg mb-4">What&apos;s included:</h3>
                         <ul className="space-y-3">
                             {[
                                 "Ad-free browsing experience",
-                                "Exclusive 'Opinion & Analysis' articles",
+                                "Exclusive &apos;Opinion & Analysis&apos; articles",
                                 "Daily AI-curated executive briefs",
                                 "Priority access to new features",
                                 "Support independent journalism"

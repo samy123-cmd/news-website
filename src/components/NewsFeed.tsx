@@ -1,19 +1,22 @@
+
 import { createClient } from "@/lib/supabase/server";
 import { NewsCard } from "./NewsCard";
+import { Sparkles } from "lucide-react";
 
 interface NewsFeedProps {
     category?: string;
     subcategory?: string;
+    limit?: number;
 }
 
-export async function NewsFeed({ category, subcategory }: NewsFeedProps) {
+export async function NewsFeed({ category, subcategory, limit = 20 }: NewsFeedProps) {
     const supabase = await createClient();
 
     let query = supabase
         .from("articles")
         .select("*")
         .order("published_at", { ascending: false })
-        .limit(20);
+        .limit(limit);
 
     if (category && category !== "All") {
         query = query.eq("category", category);
@@ -27,14 +30,14 @@ export async function NewsFeed({ category, subcategory }: NewsFeedProps) {
 
     if (!articles?.length) {
         return (
-            <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                    <span className="text-2xl">📰</span>
+            <div className="flex flex-col items-center justify-center py-32 text-center space-y-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
+                    <Sparkles className="w-10 h-10 text-primary" />
                 </div>
                 <div className="space-y-2">
-                    <h2 className="text-2xl font-heading font-bold text-foreground">No news found</h2>
-                    <p className="text-muted-foreground max-w-md mx-auto">
-                        We couldn't find any articles for this category. Try checking back later!
+                    <h2 className="text-3xl font-heading font-bold text-foreground">No stories yet</h2>
+                    <p className="text-muted-foreground max-w-md mx-auto text-lg">
+                        Our AI is currently scanning the globe for the latest updates in {category}. Check back in a few minutes.
                     </p>
                 </div>
             </div>
@@ -42,7 +45,7 @@ export async function NewsFeed({ category, subcategory }: NewsFeedProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article, index) => (
                 <NewsCard key={article.id} article={article} index={index} />
             ))}

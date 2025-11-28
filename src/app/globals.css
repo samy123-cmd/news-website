@@ -2,9 +2,9 @@
 
 @theme inline {
   --font-sans: var(--font-inter);
-  --font-heading: var(--font-outfit);
-  --font-playfair: var(--font-playfair);
-  /* Added font variable */
+  --font-heading: var(--font-manrope);
+  --font-serif: var(--font-playfair);
+  --font-hindi: var(--font-noto-sans-devanagari);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -22,57 +22,100 @@
   --color-card-foreground: var(--card-foreground);
 
   --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  /* Deep Navy Theme */
+  --background: #0b1624;
+  /* Deep Navy */
+  --foreground: #F5F7FA;
+  /* Off-white */
 
-  --primary: #2563eb;
+  --primary: #1EA7FF;
+  /* Electric Blue */
   --primary-foreground: #ffffff;
 
-  --secondary: #10b981;
+  --secondary: #1572FF;
+  /* Cerulean */
   --secondary-foreground: #ffffff;
 
-  --accent: #8b5cf6;
-  --accent-foreground: #ffffff;
+  --accent: #F6C85F;
+  /* Gold Highlights */
+  --accent-foreground: #0b1624;
 
-  --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card: #142235;
+  /* Slate */
+  --card-foreground: #F5F7FA;
 
-  --border: #e2e8f0;
+  --border: #1e293b;
+  --muted: #1e293b;
+  --muted-foreground: #9AA6B2;
+  /* Muted Gray */
+
+  --popover: #142235;
+  --popover-foreground: #F5F7FA;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    /* Slate 900 */
-    --foreground: #f8fafc;
-    /* Slate 50 */
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(20, 34, 53, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
 
-    --primary: #3b82f6;
-    /* Blue 500 */
-    --primary-foreground: #ffffff;
+.glass-card {
+  background: linear-gradient(145deg, rgba(20, 34, 53, 0.9), rgba(11, 22, 36, 0.95));
+  border: 1px solid rgba(30, 167, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
 
-    --secondary: #10b981;
-    /* Emerald 500 */
-    --secondary-foreground: #ffffff;
+/* Neon Glow */
+.neon-glow:hover {
+  box-shadow: 0 0 15px rgba(30, 167, 255, 0.3);
+  border-color: rgba(30, 167, 255, 0.5);
+}
 
-    --accent: #a78bfa;
-    /* Violet 400 */
-    --accent-foreground: #ffffff;
-
-    --card: #1e293b;
-    /* Slate 800 */
-    --card-foreground: #f8fafc;
-
-    --border: #334155;
-    /* Slate 700 */
+/* Ticker Animation */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
   }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 60s linear infinite;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }

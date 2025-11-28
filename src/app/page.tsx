@@ -1,130 +1,88 @@
+
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import { NewsFeed } from "@/components/NewsFeed";
 import { HeroSection } from "@/components/HeroSection";
-import { Ticker } from "@/components/Ticker";
-import { CategoryPills } from "@/components/CategoryPills";
-import { OpinionSection } from "@/components/OpinionSection";
-import { MegaFooter } from "@/components/MegaFooter";
-import { AdUnit } from "@/components/monetization/AdUnit";
-import { SubscriptionBanner } from "@/components/monetization/SubscriptionBanner";
-import { SponsoredNewsCard } from "@/components/monetization/SponsoredNewsCard";
-import { ScrollProgress } from "@/components/ui/ScrollProgress";
-import { ReaderModeToggle } from "@/components/ui/ReaderModeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
+import { TrendingBar } from "@/components/TrendingBar";
+import { NewsFeed } from "@/components/NewsFeed";
+import { AIAnalysisBlock } from "@/components/AIAnalysisBlock";
 import { NewsFeedSkeleton } from "@/components/NewsFeedSkeleton";
 
-// Mock Categories (In real app, fetch from DB)
-const CATEGORIES = [
-  { name: "World", subcategories: ["Politics", "Conflict", "Climate"] },
-  { name: "Business", subcategories: ["Markets", "Tech", "Economy"] },
-  { name: "Technology", subcategories: ["AI", "Space", "Gadgets"] },
-  { name: "Sports", subcategories: ["Cricket", "Football", "Tennis"] },
-  { name: "Entertainment", subcategories: ["Bollywood", "Hollywood", "Music"] },
-];
+export const dynamic = 'force-dynamic';
 
 interface HomeProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{
+    category?: string;
+    subcategory?: string;
+  }>;
 }
 
-export default function Home({ searchParams }: HomeProps) {
-  const category = (searchParams.category as string) || "All";
-  const subcategory = (searchParams.subcategory as string) || "All";
+export async function generateMetadata({ searchParams }: HomeProps): Promise<Metadata> {
+  const { category = "All" } = await searchParams;
+
+  const title = category === "All"
+    ? "Global AI News | Real-time AI-curated News"
+    : `${category} News | Global AI News`;
+
+  return {
+    title,
+    description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real-time.`,
+    openGraph: {
+      title,
+      description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real-time.`,
+      type: 'website',
+    },
+  };
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const { category = "All", subcategory = "All" } = await searchParams;
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
-      <ScrollProgress />
-      <ReaderModeToggle />
-
-      <div className="ticker-container">
-        <Ticker />
-      </div>
-
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold font-heading">
-              AI
-            </div>
-            <h1 className="text-xl font-heading font-bold">Global News</h1>
-          </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            {/* We can make these links too if we want, but CategoryPills handles the main nav now */}
-            <span className="text-foreground font-bold">Trending</span>
-            <LanguageToggle />
-          </nav>
-          <div className="w-8 md:hidden">
-            <LanguageToggle />
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8 space-y-12 flex-grow">
-        {/* Only show Hero on "All" view to keep it clean */}
-        {category === "All" && (
-          <>
+    <div className="bg-background min-h-screen">
+      {/* Hero Section (Only show on Home/All) */}
+      {category === "All" && (
+        <div className="container mx-auto px-4 pt-6 pb-8">
+          <Suspense fallback={<div className="h-[600px] bg-white/5 animate-pulse rounded-2xl" />}>
             <HeroSection />
-            <div className="ad-unit">
-              <AdUnit slotId="hero-banner" className="mx-auto" />
-            </div>
-          </>
-        )}
+          </Suspense>
+        </div>
+      )}
 
-        <section className="space-y-6">
-          <div className="space-y-4 border-b border-border/50 pb-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-heading font-bold tracking-tight">
-                {category === "All" ? "Latest Stories" : category}
+      {/* Trending Bar */}
+      <TrendingBar />
+
+      {/* Main Content Area */}
+      <div className="container mx-auto px-4 pb-16">
+        <div className="flex flex-col gap-12">
+
+          {/* News Feed */}
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-heading font-bold text-foreground relative inline-block">
+                {category === "All" ? "Latest Headlines" : category}
+                <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full" />
               </h2>
-              <span className="text-sm text-muted-foreground">
-                {subcategory !== "All" ? subcategory : "Real-time updates"}
-              </span>
+              {category === "All" && (
+                <a
+                  href="/headlines"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                >
+                  See All
+                  <span aria-hidden="true">→</span>
+                </a>
+              )}
             </div>
 
-            <Suspense fallback={<div className="h-10 bg-muted animate-pulse rounded-full w-full max-w-md" />}>
-              <CategoryPills categories={CATEGORIES} />
+            <Suspense fallback={<NewsFeedSkeleton />}>
+              <NewsFeed category={category} subcategory={subcategory} limit={category === "All" ? 5 : 20} />
             </Suspense>
-          </div>
+          </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3 news-grid">
-              <Suspense fallback={<NewsFeedSkeleton />}>
-                <NewsFeed category={category} subcategory={subcategory} />
-              </Suspense>
-            </div>
-            <div className="space-y-8 sidebar-content">
-              {/* Sidebar Ads & Sponsored */}
-              <div className="ad-unit">
-                <AdUnit slotId="sidebar-top" format="rectangle" />
-              </div>
+          {/* AI Analysis Block (Interspersed) */}
+          {category === "All" && <AIAnalysisBlock />}
 
-              <div className="sponsored-card">
-                <SponsoredNewsCard
-                  article={{
-                    id: "sp-1",
-                    title: "The Future of FinTech: Investing in 2025",
-                    summary: "Discover how AI is reshaping the financial landscape and what it means for your portfolio.",
-                    sponsorName: "WealthGen AI",
-                    image_url: "https://images.unsplash.com/photo-1611974765270-ca12586343bb?w=800&q=80",
-                    url: "#",
-                    sponsorLogo: "https://ui-avatars.com/api/?name=WG&background=0D8ABC&color=fff"
-                  }}
-                />
-              </div>
-
-              <div className="ad-unit sticky top-24">
-                <AdUnit slotId="sidebar-sticky" format="vertical" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Opinion Section - Only on Home */}
-        {category === "All" && <OpinionSection />}
-
-        <SubscriptionBanner />
+        </div>
       </div>
-
-      <MegaFooter />
-    </main>
+    </div>
   );
 }

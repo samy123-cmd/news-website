@@ -11,6 +11,12 @@ const FEEDS = [
     'https://feeds.feedburner.com/ndtvnews-top-stories',
 ];
 
+import { scrapeArticle } from '@/lib/news/scraper';
+
+// ... (imports)
+
+// ... (FEEDS array)
+
 export async function ingestNews() {
     const supabase = await createClient();
     const results = [];
@@ -22,32 +28,46 @@ export async function ingestNews() {
             for (const item of feed.items) {
                 if (!item.link || !item.title) continue;
 
-                // 1. Check if article exists to save AI costs
-                const { data: existing } = await supabase
+                // 1. Check if article exists
+                const { data: existing, error: fetchError } = await supabase
                     .from('articles')
                     .select('id')
                     .eq('url', item.link)
                     .single();
 
-                if (existing) continue;
+                if (fetchError && fetchError.code !== 'PGRST116') {
+                    console.error("Error checking existence:", fetchError);
+                }
 
-                // 2. Polish Content with AI
-                const rawSummary = item.contentSnippet || item.content || "";
-                const polished = await polishContent(rawSummary, item.title);
+                if (existing) {
+                    continue;
+                }
 
-                // 3. Insert into DB
+                // 2. Scrape Full Content
+                const scraped = await scrapeArticle(item.link);
+                const fullContent = scraped?.content || item.content || item.contentSnippet || "";
+                const images = scraped?.images || [];
+
+                // 3. Polish Content with AI (pass full text if available, or summary)
+                // We pass the scraped text content for better AI summarization
+                const textToPolish = scraped?.textContent || item.contentSnippet || "";
+                const polished = await polishContent(textToPolish.substring(0, 5000), item.title); // Limit text length for AI
+
+                // 4. Insert into DB
                 const { error } = await supabase
                     .from('articles')
                     .insert({
-                        title: polished.headline, // Use AI-refined headline
+                        title: polished.headline,
                         url: item.link,
-                        summary: polished.summary, // Use AI summary
+                        summary: polished.summary,
+                        content: fullContent, // Store full HTML content
                         source: feed.title || 'Unknown',
                         published_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
                         language: 'en',
                         category: polished.category,
                         subcategory: polished.subcategory,
-                        // We could also store sentiment/readTime if we added columns for them
+                        images: images, // Store extracted images
+                        image_url: images.length > 0 ? images[0] : null // Use first scraped image as thumbnail if available
                     });
 
                 if (error) {

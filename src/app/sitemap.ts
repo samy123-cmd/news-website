@@ -1,25 +1,65 @@
+
 import { MetadataRoute } from 'next';
+import { createClient } from '@/lib/supabase/server';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://global-ai-news.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://news-project.vercel.app';
 
-    // In a real app, you would fetch these from your database
-    const categories = ['World', 'Business', 'Technology', 'Sports', 'Entertainment'];
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    const supabase = await createClient();
 
-    const categoryUrls = categories.map((cat) => ({
-        url: `${baseUrl}/?category=${cat}`,
-        lastModified: new Date(),
-        changeFrequency: 'hourly' as const,
+    // Fetch all articles
+    const { data: articles } = await supabase
+        .from('articles')
+        .select('id, published_at')
+        .order('published_at', { ascending: false })
+        .limit(1000);
+
+    const articleUrls = (articles || []).map((article) => ({
+        url: `${BASE_URL}/article/${article.id}`,
+        lastModified: new Date(article.published_at),
+        changeFrequency: 'daily' as const,
         priority: 0.8,
     }));
 
+    const staticRoutes = [
+        '',
+        '/headlines',
+        '/about-us',
+        '/careers',
+        '/code-of-ethics',
+        '/privacy-policy',
+        '/terms-of-service',
+        '/help-center',
+        '/advertisers',
+        '/press-center',
+        '/developer-api',
+        '/rss-feeds',
+        '/newsletters',
+    ].map((route) => ({
+        url: `${BASE_URL}${route}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: route === '' ? 1 : 0.5,
+    }));
+
+    const editions = [
+        'united-states',
+        'india',
+        'united-kingdom',
+        'europe',
+        'asia-pacific',
+        'middle-east',
+        'africa',
+    ].map((region) => ({
+        url: `${BASE_URL}/edition/${region}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily' as const,
+        priority: 0.7,
+    }));
+
     return [
-        {
-            url: baseUrl,
-            lastModified: new Date(),
-            changeFrequency: 'always',
-            priority: 1,
-        },
-        ...categoryUrls,
+        ...staticRoutes,
+        ...editions,
+        ...articleUrls,
     ];
 }

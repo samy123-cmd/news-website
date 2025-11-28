@@ -14,6 +14,8 @@ create table articles (
   language text default 'en',
   category text,
   subcategory text,
+  images text[],
+  status text default 'published',
   created_at timestamptz default now()
 );
 
