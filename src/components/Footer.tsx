@@ -116,72 +116,72 @@ export function Footer() {
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Links Column 1 */}
-                    <div>
-                        <h4 className="font-bold text-foreground mb-6">Editions</h4>
-                        <ul className="space-y-3 text-sm text-muted-foreground">
-                            {EDITIONS.map((item) => (
-                                <li key={item.label}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
-                                                <Globe className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
-                                                {item.label}
-                                            </Link>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
-                                            <p>{item.description}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                        {/* Links Column 1 */}
+                        <div>
+                            <h4 className="font-bold text-foreground mb-6">Editions</h4>
+                            <ul className="space-y-3 text-sm text-muted-foreground">
+                                {EDITIONS.map((item) => (
+                                    <li key={item.label}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
+                                                    <Globe className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                    {item.label}
+                                                </Link>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
+                                                <p>{item.description}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
 
-                    {/* Links Column 2 */}
-                    <div>
-                        <h4 className="font-bold text-foreground mb-6">Company</h4>
-                        <ul className="space-y-3 text-sm text-muted-foreground">
-                            {COMPANY_LINKS.map((item) => (
-                                <li key={item.label}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
-                                                <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-primary transition-colors" />
-                                                {item.label}
-                                            </Link>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
-                                            <p>{item.description}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                        {/* Links Column 2 */}
+                        <div>
+                            <h4 className="font-bold text-foreground mb-6">Company</h4>
+                            <ul className="space-y-3 text-sm text-muted-foreground">
+                                {COMPANY_LINKS.map((item) => (
+                                    <li key={item.label}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
+                                                    <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-primary transition-colors" />
+                                                    {item.label}
+                                                </Link>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
+                                                <p>{item.description}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
 
-                    {/* Links Column 3 */}
-                    <div>
-                        <h4 className="font-bold text-foreground mb-6">Resources</h4>
-                        <ul className="space-y-3 text-sm text-muted-foreground">
-                            {RESOURCE_LINKS.map((item) => (
-                                <li key={item.label}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
-                                                <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 text-primary" />
-                                                {item.label}
-                                            </Link>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
-                                            <p>{item.description}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </li>
-                            ))}
-                        </ul>
+                        {/* Links Column 3 */}
+                        <div>
+                            <h4 className="font-bold text-foreground mb-6">Resources</h4>
+                            <ul className="space-y-3 text-sm text-muted-foreground">
+                                {RESOURCE_LINKS.map((item) => (
+                                    <li key={item.label}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
+                                                    <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 text-primary" />
+                                                    {item.label}
+                                                </Link>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
+                                                <p>{item.description}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

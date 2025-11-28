@@ -20,7 +20,7 @@ export function FeaturedArticle({ article }: { article: Article }) {
     return (
         <div className="relative group w-full h-full min-h-[500px] rounded-2xl overflow-hidden shadow-2xl">
             {/* Full Bleed Image */}
-            <div className="absolute inset-0">
+            <Link href={`/article/${article.id}`} className="absolute inset-0 z-10 block cursor-pointer">
                 {article.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -33,7 +33,7 @@ export function FeaturedArticle({ article }: { article: Article }) {
                 )}
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-[#0b1624]/60 to-transparent opacity-90" />
-            </div>
+            </Link>
 
             {/* Content Overlay */}
             <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 z-20">

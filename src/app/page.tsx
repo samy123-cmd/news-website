@@ -1,5 +1,6 @@
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { HeroSection } from "@/components/HeroSection";
 import { TrendingBar } from "@/components/TrendingBar";
@@ -63,13 +64,13 @@ export default async function Home({ searchParams }: HomeProps) {
                 <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full" />
               </h2>
               {category === "All" && (
-                <a
+                <Link
                   href="/headlines"
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
                 >
                   See All
                   <span aria-hidden="true">→</span>
-                </a>
+                </Link>
               )}
             </div>
 

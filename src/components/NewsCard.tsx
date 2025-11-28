@@ -52,7 +52,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                 className="group flex flex-col h-full overflow-hidden rounded-2xl glass-card hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1"
             >
                 {/* Image Section */}
-                <div className="relative h-56 overflow-hidden">
+                <Link href={`/article/${article.id}`} className="relative h-56 overflow-hidden block cursor-pointer">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] to-transparent z-10 opacity-60" />
 
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -74,7 +74,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                             {article.read_time || "3"} {t("min read")}
                         </div>
                     </div>
-                </div>
+                </Link>
 
                 {/* Content Section */}
                 <div className="flex flex-col flex-grow p-6 space-y-4">
