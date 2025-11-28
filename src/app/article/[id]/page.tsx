@@ -193,6 +193,35 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                             />
                         </article>
 
+                        {/* AI Provenance & Source */}
+                        <div className="mt-12 pt-8 border-t border-white/10">
+                            <div className="bg-white/5 rounded-xl p-6 border border-white/5">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                    <span className="text-xs font-bold uppercase tracking-widest text-primary">AI Provenance</span>
+                                </div>
+                                <p className="text-sm text-gray-400 italic mb-4">
+                                    This article was summarized and polished by our AI engine to ensure clarity and neutrality.
+                                    <br />
+                                    <span className="text-white/80 not-italic">Reviewed by: <span className="font-bold text-white">Global AI News Team</span></span>
+                                </p>
+                                {article.url && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-muted-foreground">Source:</span>
+                                        <a
+                                            href={article.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary hover:underline flex items-center gap-1 font-medium"
+                                        >
+                                            {article.source}
+                                            <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Image Gallery */}
                         {article.images && article.images.length > 1 && (
                             <div className="mt-16 pt-16 border-t border-white/10">

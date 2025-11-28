@@ -36,7 +36,7 @@
   --foreground: #F5F7FA;
   /* Off-white */
 
-  --primary: #1EA7FF;
+  --primary: #007AFF;
   /* Electric Blue */
   --primary-foreground: #ffffff;
 
@@ -59,6 +59,38 @@
 
   --popover: #142235;
   --popover-foreground: #F5F7FA;
+
+  /* Typography Scale */
+  --font-size-base: 16px;
+  --h1: 48px;
+  --h2: 32px;
+  --h3: 20px;
+
+  --line-height-base: 1.6;
+  --line-height-heading: 1.2;
+}
+
+html {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+h1,
+.h1 {
+  font-size: var(--h1);
+  line-height: var(--line-height-heading);
+}
+
+h2,
+.h2 {
+  font-size: var(--h2);
+  line-height: var(--line-height-heading);
+}
+
+h3,
+.h3 {
+  font-size: var(--h3);
+  line-height: var(--line-height-heading);
 }
 
 /* Glassmorphism Utilities */

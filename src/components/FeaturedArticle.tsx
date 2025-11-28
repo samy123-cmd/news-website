@@ -4,6 +4,7 @@
 import { Clock, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Article {
     id: string;
@@ -22,25 +23,28 @@ export function FeaturedArticle({ article }: { article: Article }) {
             {/* Full Bleed Image */}
             <Link href={`/article/${article.id}`} className="absolute inset-0 z-10 block cursor-pointer">
                 {article.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                         src={article.image_url}
                         alt={article.title}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        fill
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 60vw"
+                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                 ) : (
                     <div className="w-full h-full bg-slate-900" />
                 )}
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-[#0b1624]/60 to-transparent opacity-90" />
+                {/* Gradient Overlay - Stronger for better contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-[#0b1624]/80 to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0b1624]/90 via-transparent to-transparent opacity-60" />
             </Link>
 
             {/* Content Overlay */}
-            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 z-20">
-                <div className="space-y-6 max-w-3xl">
+            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 z-20 pointer-events-none">
+                <div className="space-y-6 max-w-3xl pointer-events-auto">
                     {/* Badge & Meta */}
                     <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-[#F6C85F] text-[#0b1624] rounded-full shadow-lg flex items-center gap-1">
+                        <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-accent text-accent-foreground rounded-full shadow-lg flex items-center gap-1">
                             <Sparkles className="w-3 h-3" /> Featured
                         </span>
                         <div className="flex items-center space-x-2 text-xs font-medium text-white/80 uppercase tracking-widest">
@@ -51,12 +55,12 @@ export function FeaturedArticle({ article }: { article: Article }) {
                     </div>
 
                     {/* Headline */}
-                    <h2 className="text-3xl md:text-5xl font-heading font-bold leading-tight text-white group-hover:text-primary transition-colors drop-shadow-lg">
+                    <h2 className="text-4xl md:text-6xl font-heading font-bold leading-tight text-white group-hover:text-primary transition-colors drop-shadow-lg">
                         {article.title}
                     </h2>
 
                     {/* Summary */}
-                    <p className="text-gray-300 leading-relaxed text-lg line-clamp-3 md:line-clamp-2 max-w-2xl font-serif">
+                    <p className="text-gray-300 leading-relaxed text-lg md:text-xl line-clamp-3 md:line-clamp-2 max-w-2xl font-serif">
                         {article.summary}
                     </p>
 

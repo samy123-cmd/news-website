@@ -8,6 +8,7 @@ import { TopBar } from "@/components/TopBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import JsonLd from "@/components/seo/JsonLd";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -74,6 +75,14 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+
+  alternates: {
+    canonical: BASE_URL,
+    languages: {
+      'en-US': '/?lang=en',
+      'hi-IN': '/?lang=hi',
+    },
+  },
 };
 
 export default function RootLayout({
@@ -96,6 +105,7 @@ export default function RootLayout({
               </Suspense>
               <main className="flex-grow">
                 {children}
+                <Analytics />
               </main>
               <Footer />
             </div>

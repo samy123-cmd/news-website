@@ -26,10 +26,13 @@ export async function HeroSection() {
 
     return (
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[600px]">
-            <div className="lg:col-span-9 h-full">
+            {/* Hero Content - Desktop: Left 60%, Mobile: Top */}
+            <div className="lg:col-span-8 h-[500px] lg:h-full relative rounded-2xl overflow-hidden group">
                 <FeaturedArticle article={featuredData} />
             </div>
-            <div className="lg:col-span-3 h-full">
+
+            {/* Sidebar / Quick Reads - Desktop: Right 40% */}
+            <div className="lg:col-span-4 h-full flex flex-col gap-6">
                 <QuickReads articles={quickReadsData || []} />
             </div>
         </section>
