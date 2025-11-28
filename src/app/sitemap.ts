@@ -8,11 +8,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient();
 
     // Fetch all articles
+    // Fetch articles from the last 48 hours
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+
     const { data: articles } = await supabase
         .from('articles')
         .select('id, published_at')
-        .order('published_at', { ascending: false })
-        .limit(1000);
+        .gte('published_at', fortyEightHoursAgo)
+        .order('published_at', { ascending: false });
 
     const articleUrls = (articles || []).map((article) => ({
         url: `${BASE_URL}/article/${article.id}`,

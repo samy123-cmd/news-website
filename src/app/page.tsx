@@ -1,8 +1,8 @@
-
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { HeroSection } from "@/components/HeroSection";
+import { NewsletterStrip } from "@/components/NewsletterStrip";
 import { TrendingBar } from "@/components/TrendingBar";
 import { NewsFeed } from "@/components/NewsFeed";
 import { AIAnalysisBlock } from "@/components/AIAnalysisBlock";
@@ -26,10 +26,10 @@ export async function generateMetadata({ searchParams }: HomeProps): Promise<Met
 
   return {
     title,
-    description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real-time.`,
+    description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real - time.`,
     openGraph: {
       title,
-      description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real-time.`,
+      description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real - time.`,
       type: 'website',
     },
   };
@@ -46,6 +46,13 @@ export default async function Home({ searchParams }: HomeProps) {
           <Suspense fallback={<div className="h-[600px] bg-white/5 animate-pulse rounded-2xl" />}>
             <HeroSection />
           </Suspense>
+        </div>
+      )}
+
+      {/* Newsletter Strip (Only show on Home/All) */}
+      {category === "All" && (
+        <div className="container mx-auto px-4 pb-8">
+          <NewsletterStrip />
         </div>
       )}
 
