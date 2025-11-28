@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
 const subscribeSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -11,15 +11,8 @@ export async function POST(request: Request) {
         const body = await request.json();
 
         // Validate input
-        const result = subscribeSchema.safeParse(body);
-        if (!result.success) {
-            return NextResponse.json(
-                { error: result.error.errors[0].message },
-                { status: 400 }
-            );
-        }
+        const { email } = subscribeSchema.parse(body);
 
-        const { email } = result.data;
         const supabase = await createClient();
 
         // Check if already subscribed
@@ -54,7 +47,7 @@ export async function POST(request: Request) {
 
         if (insertError) {
             // Handle unique constraint violation just in case race condition
-            if (insertError.code === '23505') {
+            if ((insertError as any).code === '23505') {
                 return NextResponse.json(
                     { message: "You are already subscribed!" },
                     { status: 200 }
@@ -66,6 +59,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: "Successfully subscribed! Check your inbox soon." });
 
     } catch (error) {
+        if (error instanceof ZodError) {
+            return NextResponse.json(
+                { error: (error as any).errors[0].message },
+                { status: 400 }
+            );
+        }
         console.error('Newsletter subscription error:', error);
         return NextResponse.json(
             { error: "Something went wrong. Please try again later." },

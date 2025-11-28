@@ -45,7 +45,7 @@ export function TopBar() {
             {/* Right: Utilities */}
             <div className="flex items-center gap-4 shrink-0">
                 {/* Region Selector (Mock) */}
-                <button className="flex items-center gap-1.5 hover:text-foreground transition-colors">
+                <button className="flex items-center gap-1.5 hover:text-foreground transition-colors" aria-label="Select Region">
                     <Globe className="w-3.5 h-3.5" />
                     <span>Global</span>
                 </button>
@@ -58,12 +58,12 @@ export function TopBar() {
                 <div className="h-3 w-px bg-white/10" />
 
                 {/* Search */}
-                <button className="hover:text-primary transition-colors">
+                <button className="hover:text-primary transition-colors" aria-label="Search">
                     <Search className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Profile */}
-                <button className="hover:text-primary transition-colors">
+                <button className="hover:text-primary transition-colors" aria-label="User Profile">
                     <User className="w-3.5 h-3.5" />
                 </button>
             </div>

@@ -148,11 +148,13 @@ export function Header() {
                                 onClick={() => {
                                     if (!searchOpen) setSearchOpen(true);
                                 }}
+                                aria-label="Search"
                             />
                             <input
                                 name="q"
                                 type="text"
                                 placeholder="Search..."
+                                aria-label="Search Query"
                                 className={cn(
                                     "bg-transparent border-none outline-none text-sm text-foreground ml-2 w-full placeholder:text-muted-foreground/50",
                                     searchOpen ? "block" : "hidden"
@@ -174,6 +176,7 @@ export function Header() {
                     <button
                         className="lg:hidden text-foreground p-2"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle Mobile Menu"
                     >
                         {mobileMenuOpen ? <X /> : <Menu />}
                     </button>

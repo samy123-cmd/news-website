@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { ArrowRight, Sparkles, TrendingUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { AdUnit } from "@/components/AdUnit";
 
 interface ArticleSidebarProps {
     currentArticleId: string;
@@ -95,6 +96,9 @@ export async function ArticleSidebar({ currentArticleId, category }: ArticleSide
                     View all {category} news <ArrowRight className="w-3 h-3" />
                 </Link>
             </div>
+
+            {/* Sidebar Ad */}
+            <AdUnit slotId="sidebar-sticky" format="rectangle" />
         </aside>
     );
 }

@@ -98,10 +98,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         <span className="font-bold text-sm">Back to Feed</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary" title="Save for later">
+                        <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary" title="Save for later" aria-label="Save article for later">
                             <Bookmark className="w-5 h-5" />
                         </button>
-                        <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary" title="Share">
+                        <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary" title="Share" aria-label="Share article">
                             <Share2 className="w-5 h-5" />
                         </button>
                     </div>

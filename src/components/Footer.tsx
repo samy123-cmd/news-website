@@ -204,6 +204,7 @@ export function Footer() {
                                     <a
                                         href={social.href}
                                         className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20"
+                                        aria-label={social.label}
                                     >
                                         <social.icon className="w-4 h-4" />
                                     </a>

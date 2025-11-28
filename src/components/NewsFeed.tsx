@@ -1,7 +1,9 @@
 
+import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { NewsCard } from "./NewsCard";
 import { Sparkles } from "lucide-react";
+import { AdUnit } from "@/components/AdUnit";
 
 interface NewsFeedProps {
     category?: string;
@@ -47,7 +49,14 @@ export async function NewsFeed({ category, subcategory, limit = 20 }: NewsFeedPr
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article, index) => (
-                <NewsCard key={article.id} article={article} index={index} />
+                <React.Fragment key={article.id}>
+                    <NewsCard article={article} index={index} />
+                    {(index + 1) % 6 === 0 && (
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-center">
+                            <AdUnit slotId={`feed-${index}`} label="Sponsored" />
+                        </div>
+                    )}
+                </React.Fragment>
             ))}
         </div>
     );
