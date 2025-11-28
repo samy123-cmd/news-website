@@ -122,12 +122,13 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                             </Button>
                         </div>
 
-                        <Button size="sm" className="h-9 px-4 text-xs font-bold bg-white/5 hover:bg-primary hover:text-white text-foreground border border-white/10 transition-all rounded-lg group/btn" asChild>
-                            <Link href={`/article/${article.id}`}>
-                                {t("Read More")}
-                                <ArrowRight className="w-3.5 h-3.5 ml-2 transition-transform group-hover/btn:translate-x-1" />
-                            </Link>
-                        </Button>
+                        <Link
+                            href={`/article/${article.id}`}
+                            className="inline-flex items-center justify-center whitespace-nowrap text-xs font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white/5 hover:bg-primary hover:text-white text-foreground border border-white/10 transition-all rounded-lg group/btn h-9 px-4"
+                        >
+                            {t("Read More")}
+                            <ArrowRight className="w-3.5 h-3.5 ml-2 transition-transform group-hover/btn:translate-x-1" />
+                        </Link>
                     </div>
                 </div>
             </motion.div>

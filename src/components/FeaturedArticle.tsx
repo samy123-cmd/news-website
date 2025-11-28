@@ -66,12 +66,13 @@ export function FeaturedArticle({ article }: { article: Article }) {
 
                     {/* CTA */}
                     <div className="pt-4 flex items-center gap-4">
-                        <Button className="bg-primary hover:bg-primary/90 text-white border-0 shadow-lg shadow-primary/25 h-12 px-6 rounded-xl" asChild>
-                            <Link href={`/article/${article.id}`}>
-                                Read Full Story
-                                <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                            </Link>
-                        </Button>
+                        <Link
+                            href={`/article/${article.id}`}
+                            className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-12 px-6 rounded-xl"
+                        >
+                            Read Full Story
+                            <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                        </Link>
 
                         <div className="flex items-center text-xs text-white/60 font-medium bg-white/10 backdrop-blur-md px-3 py-2 rounded-lg border border-white/5">
                             <Clock className="w-3.5 h-3.5 mr-1.5" />
