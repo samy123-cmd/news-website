@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Share2, Bookmark, Clock, ExternalLink, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Share2, Bookmark, Clock, ExternalLink, MessageSquare, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
 import { ArticleSidebar } from '@/components/ArticleSidebar';
@@ -195,30 +195,56 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
                         {/* AI Provenance & Source */}
                         <div className="mt-12 pt-8 border-t border-white/10">
-                            <div className="bg-white/5 rounded-xl p-6 border border-white/5">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                    <span className="text-xs font-bold uppercase tracking-widest text-primary">AI Provenance</span>
-                                </div>
-                                <p className="text-sm text-gray-400 italic mb-4">
-                                    This article was summarized and polished by our AI engine to ensure clarity and neutrality.
-                                    <br />
-                                    <span className="text-white/80 not-italic">Reviewed by: <span className="font-bold text-white">Global AI News Team</span></span>
-                                </p>
-                                {article.url && (
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <span className="text-muted-foreground">Source:</span>
-                                        <a
-                                            href={article.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary hover:underline flex items-center gap-1 font-medium"
-                                        >
-                                            {article.source}
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
+                            <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/5 shadow-xl">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center ring-1 ring-primary/20">
+                                            <Sparkles className="w-5 h-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-white text-lg">AI-Enhanced Reporting</h3>
+                                            <p className="text-xs text-muted-foreground">Transparency & Provenance</p>
+                                        </div>
                                     </div>
-                                )}
+
+                                    <div className="flex items-center gap-2 text-xs font-medium bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                        <span>Verified by Editorial Board</span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-400">
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-white text-xs uppercase tracking-wider">Methodology</p>
+                                        <p className="leading-relaxed">
+                                            This article was synthesized from multiple verified sources to provide a neutral, comprehensive overview. Our AI engine cross-references facts to minimize bias.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-white text-xs uppercase tracking-wider">Primary Source</p>
+                                        {article.url ? (
+                                            <a
+                                                href={article.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2 text-primary hover:underline bg-primary/5 p-3 rounded-lg border border-primary/10 transition-colors hover:bg-primary/10"
+                                            >
+                                                <span className="font-bold">{article.source}</span>
+                                                <ExternalLink className="w-3 h-3 ml-auto" />
+                                            </a>
+                                        ) : (
+                                            <p>Source unavailable</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Inline Ad Placeholder (Monetization) */}
+                        <div className="my-12 flex justify-center">
+                            <div className="w-full max-w-[728px] h-[90px] bg-white/5 border border-white/5 rounded-lg flex items-center justify-center relative overflow-hidden">
+                                <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Advertisement</span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
                             </div>
                         </div>
 

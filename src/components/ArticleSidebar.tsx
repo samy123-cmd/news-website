@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, TrendingUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { AdUnit } from "@/components/AdUnit";
+import { analytics } from "@/lib/analytics";
 
 interface ArticleSidebarProps {
     currentArticleId: string;
@@ -24,29 +25,17 @@ export async function ArticleSidebar({ currentArticleId, category }: ArticleSide
 
     return (
         <aside className="space-y-8">
-            {/* AI Key Takeaways (Simulated for now, can be real later) */}
-            <div className="bg-primary/5 border border-primary/10 rounded-xl p-6 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-700 group-hover:bg-primary/20" />
+            {/* Newsletter CTA */}
+            <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-6 relative overflow-hidden text-center">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
 
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <Sparkles className="w-5 h-5 text-primary" />
+                <div className="relative z-10 space-y-4">
+                    <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2 ring-1 ring-primary/50">
+                        <Sparkles className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="font-heading font-bold text-lg text-foreground">AI Key Takeaways</h3>
-                </div>
 
-                <ul className="space-y-3">
-                    {[
-                        "This event marks a significant shift in global policy.",
-                        "Experts warn of potential long-term economic impacts.",
-                        "New technology could accelerate adoption rates by 50%."
-                    ].map((point, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-muted-foreground leading-relaxed">
-                            <span className="text-primary font-bold">•</span>
-                            {point}
-                        </li>
-                    ))}
-                </ul>
+                    <p className="text-[10px] text-white/40">No spam, unsubscribe anytime.</p>
+                </div>
             </div>
 
             {/* Related News */}

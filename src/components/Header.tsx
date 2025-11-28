@@ -63,21 +63,21 @@ export function Header() {
             onMouseLeave={() => setActiveDropdown(null)}
         >
             <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between relative">
+                <div className="flex items-center justify-between relative h-16 lg:h-auto">
                     {/* Left: Logo & Date */}
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-4 lg:gap-8">
                         <Link href="/" className="flex items-center gap-3 group">
-                            <div className="relative w-10 h-10">
+                            <div className="relative w-8 h-8 lg:w-10 lg:h-10">
                                 <div className="absolute inset-0 bg-primary rounded-xl rotate-3 group-hover:rotate-6 transition-transform duration-300 opacity-50 blur-sm" />
-                                <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg border border-white/20 group-hover:scale-105 transition-transform duration-300">
+                                <div className="relative w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg lg:text-xl shadow-lg border border-white/20 group-hover:scale-105 transition-transform duration-300">
                                     AI
                                 </div>
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-heading font-bold text-2xl tracking-tight text-foreground leading-none">
+                                <span className="font-heading font-bold text-xl lg:text-2xl tracking-tight text-foreground leading-none">
                                     Global News
                                 </span>
-                                <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">
+                                <span className="text-[8px] lg:text-[10px] uppercase tracking-[0.2em] text-primary font-bold">
                                     Premium Edition
                                 </span>
                             </div>
@@ -174,11 +174,11 @@ export function Header() {
 
                     {/* Mobile Toggle */}
                     <button
-                        className="lg:hidden text-foreground p-2"
+                        className="lg:hidden text-foreground p-3 -mr-2 active:bg-white/10 rounded-full transition-colors"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         aria-label="Toggle Mobile Menu"
                     >
-                        {mobileMenuOpen ? <X /> : <Menu />}
+                        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
                 </div>
             </div>

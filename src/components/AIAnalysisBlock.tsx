@@ -38,13 +38,17 @@ export function AIAnalysisBlock() {
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-transparent to-transparent opacity-60" />
 
                         <div className="absolute bottom-6 left-6 right-6">
-                            <div className="bg-black/60 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 flex items-center gap-3 shadow-lg">
-                                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                            <div className="bg-black/80 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 flex items-center gap-3 shadow-lg">
+                                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 ring-1 ring-primary/50">
                                     <Sparkles className="w-4 h-4 text-primary" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-white uppercase tracking-wider">Analysis by Gemini Pro</p>
-                                    <p className="text-[10px] text-white/70">Reviewed by Editorial Board</p>
+                                    <p className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1">
+                                        AI Analysis <span className="text-white/40">|</span> Gemini Pro
+                                    </p>
+                                    <p className="text-[10px] text-white/70">
+                                        Synthesized from verified sources & reviewed by editors
+                                    </p>
                                 </div>
                             </div>
                         </div>

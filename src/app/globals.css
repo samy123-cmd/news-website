@@ -30,44 +30,48 @@
 }
 
 :root {
-  /* Deep Navy Theme */
-  --background: #0b1624;
-  /* Deep Navy */
-  --foreground: #F5F7FA;
-  /* Off-white */
+  /* Premium Editorial Theme - Deep Navy & Slate */
+  --background: #0F172A;
+  /* Slate 900 - Richer, deeper background */
+  --foreground: #F8FAFC;
+  /* Slate 50 - Crisp, clean text */
 
-  --primary: #007AFF;
-  /* Electric Blue */
-  --primary-foreground: #ffffff;
+  --primary: #38BDF8;
+  /* Sky 400 - Vibrant but professional accent */
+  --primary-foreground: #0F172A;
 
-  --secondary: #1572FF;
-  /* Cerulean */
-  --secondary-foreground: #ffffff;
+  --secondary: #64748B;
+  /* Slate 500 - Sophisticated secondary */
+  --secondary-foreground: #F8FAFC;
 
-  --accent: #F6C85F;
-  /* Gold Highlights */
-  --accent-foreground: #0b1624;
+  --accent: #F59E0B;
+  /* Amber 500 - Gold/Premium highlights */
+  --accent-foreground: #0F172A;
 
-  --card: #142235;
-  /* Slate */
-  --card-foreground: #F5F7FA;
+  --card: #1E293B;
+  /* Slate 800 - Subtle contrast for cards */
+  --card-foreground: #F8FAFC;
 
-  --border: #1e293b;
-  --muted: #1e293b;
-  --muted-foreground: #9AA6B2;
-  /* Muted Gray */
+  --border: #334155;
+  /* Slate 700 - Subtle borders */
+  --muted: #334155;
+  --muted-foreground: #94A3B8;
+  /* Slate 400 - Readable muted text */
 
-  --popover: #142235;
-  --popover-foreground: #F5F7FA;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
 
-  /* Typography Scale */
+  /* Typography Scale - More dramatic hierarchy */
   --font-size-base: 16px;
-  --h1: 48px;
-  --h2: 32px;
-  --h3: 20px;
+  --h1: 3.5rem;
+  /* Larger, more impactful */
+  --h2: 2.5rem;
+  --h3: 1.75rem;
 
-  --line-height-base: 1.6;
-  --line-height-heading: 1.2;
+  --line-height-base: 1.7;
+  /* Relaxed reading experience */
+  --line-height-heading: 1.1;
+  /* Tighter headings */
 }
 
 html {
