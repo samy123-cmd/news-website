@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useEffect } from "react";
+import { Button } from "@/components/ui/Button";
+import { AlertTriangle } from "lucide-react";
 
 export default function Error({
     error,
@@ -11,26 +12,27 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        console.error(error);
+        console.error("Global Error:", error);
     }, [error]);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground p-4">
-            <div className="max-w-md w-full bg-card border border-border rounded-2xl p-8 text-center shadow-xl">
-                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <AlertTriangle className="w-8 h-8 text-red-500" />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Something went wrong!</h2>
-                <p className="text-muted-foreground mb-8">
-                    We apologize for the inconvenience. An unexpected error has occurred.
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 px-4">
+            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-10 h-10 text-red-500" />
+            </div>
+            <div className="space-y-2 max-w-md">
+                <h2 className="text-3xl font-heading font-bold text-foreground">Something went wrong</h2>
+                <p className="text-muted-foreground">
+                    We encountered an unexpected error. Our team has been notified.
                 </p>
-                <button
-                    onClick={reset}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90 transition-colors"
-                >
-                    <RefreshCw className="w-4 h-4" />
-                    Try again
-                </button>
+            </div>
+            <div className="flex gap-4">
+                <Button onClick={() => window.location.reload()} variant="outline">
+                    Refresh Page
+                </Button>
+                <Button onClick={() => reset()} variant="default">
+                    Try Again
+                </Button>
             </div>
         </div>
     );

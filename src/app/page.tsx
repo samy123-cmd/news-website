@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { HeroSection } from "@/components/HeroSection";
+import { HeroSkeleton } from "@/components/HeroSkeleton";
 import { NewsletterStrip } from "@/components/NewsletterStrip";
 import { TrendingBar } from "@/components/TrendingBar";
 import { NewsFeed } from "@/components/NewsFeed";
 import { AIAnalysisBlock } from "@/components/AIAnalysisBlock";
 import { NewsFeedSkeleton } from "@/components/NewsFeedSkeleton";
+import { getLatestNews } from "./actions";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 interface HomeProps {
   searchParams: Promise<{
@@ -35,29 +37,63 @@ export async function generateMetadata({ searchParams }: HomeProps): Promise<Met
   };
 }
 
+import { cookies } from "next/headers";
+
 export default async function Home({ searchParams }: HomeProps) {
   const { category = "All", subcategory = "All" } = await searchParams;
+
+  // Fetch news based on category
+  let initialArticles = [];
+  if (category === "All") {
+    // Check for user preferences
+    const cookieStore = await cookies();
+    const userCategoriesCookie = cookieStore.get("user_categories");
+    let userCategories: string[] = [];
+
+    if (userCategoriesCookie) {
+      try {
+        userCategories = JSON.parse(userCategoriesCookie.value);
+      } catch (e) {
+        console.error("Failed to parse user categories", e);
+      }
+    }
+
+    if (userCategories.length > 0) {
+      // Fetch news for selected categories
+      // We'll fetch top 2 from each selected category to build a personalized feed
+      const promises = userCategories.map(cat => getLatestNews(cat.toLowerCase()));
+      const results = await Promise.all(promises);
+      initialArticles = results.flat().sort((a: any, b: any) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
+    } else {
+      // Default mix if no preferences
+      const [politics, tech, sports] = await Promise.all([
+        getLatestNews('politics'),
+        getLatestNews('technology'),
+        getLatestNews('sports')
+      ]);
+      initialArticles = [...politics, ...tech, ...sports].sort((a: any, b: any) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
+    }
+  } else {
+    initialArticles = await getLatestNews(category.toLowerCase());
+  }
 
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section (Only show on Home/All) */}
       {category === "All" && (
         <div className="container mx-auto px-4 pt-6 pb-8">
-          <Suspense fallback={<div className="h-[600px] bg-white/5 animate-pulse rounded-2xl" />}>
+          <Suspense fallback={<HeroSkeleton />}>
             <HeroSection />
           </Suspense>
         </div>
       )}
 
-      {/* Newsletter Strip (Only show on Home/All) */}
-      {category === "All" && (
-        <div className="container mx-auto px-4 pb-8">
-          <NewsletterStrip />
-        </div>
-      )}
+
 
       {/* Trending Bar */}
-      <TrendingBar />
+      <div className="mt-12">
+        <TrendingBar />
+      </div>
 
       {/* Main Content Area */}
       <div className="container mx-auto px-4 pb-16">
@@ -82,7 +118,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
 
             <Suspense fallback={<NewsFeedSkeleton />}>
-              <NewsFeed category={category} subcategory={subcategory} limit={category === "All" ? 5 : 20} />
+              <NewsFeed category={category} subcategory={subcategory} limit={category === "All" ? 20 : 20} initialArticles={initialArticles} />
             </Suspense>
           </section>
 
@@ -90,6 +126,13 @@ export default async function Home({ searchParams }: HomeProps) {
           {category === "All" && <AIAnalysisBlock />}
 
         </div>
+
+        {/* Newsletter Strip (Only show on Home/All) - Moved to bottom */}
+        {category === "All" && (
+          <div className="mt-16 mb-8">
+            <NewsletterStrip />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,123 +1,57 @@
-
 import { createClient } from '@supabase/supabase-js';
 import Parser from 'rss-parser';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as dotenv from 'dotenv';
+import { polishContent } from './src/lib/ai/polisher';
+import { getImageForCategory, CATEGORY_IMAGES } from './src/lib/constants';
 
 // Load env vars
 dotenv.config({ path: '.env.local' });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const geminiKey = process.env.GEMINI_API_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
+if (!supabaseUrl || !serviceRoleKey) {
     console.error("Missing Supabase credentials");
     process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-const parser = new Parser();
-const genAI = new GoogleGenerativeAI(geminiKey || "");
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const parser = new Parser({
+    customFields: {
+        item: [
+            ['media:content', 'mediaContent', { keepArray: true }],
+            ['media:group', 'mediaGroup'],
+            ['enclosure', 'enclosure']
+        ]
+    }
+});
 
 const FEEDS = [
     // World
-    'http://feeds.bbci.co.uk/news/world/rss.xml',
-    'https://www.aljazeera.com/xml/rss/all.xml',
-
-    // Business
-    'http://feeds.bbci.co.uk/news/business/rss.xml',
-    'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664',
-
-    // Tech
-    'http://feeds.bbci.co.uk/news/technology/rss.xml',
-    'https://feeds.feedburner.com/TechCrunch/',
-
-    // Entertainment
-    'http://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml',
-    'https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml',
-
-    // Sports
-    'http://feeds.bbci.co.uk/sport/rss.xml',
-    'https://www.espn.com/espn/rss/news',
-
-    // Science
-    'http://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
-    'https://www.sciencedaily.com/rss/top/science.xml'
+    { url: 'http://feeds.bbci.co.uk/news/world/rss.xml', category: 'World' },
+    // { url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'World' },
+    // // Business
+    // { url: 'http://feeds.bbci.co.uk/news/business/rss.xml', category: 'Business' },
+    // { url: 'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', category: 'Business' },
+    // // Tech
+    // { url: 'http://feeds.bbci.co.uk/news/technology/rss.xml', category: 'Technology' },
+    // { url: 'https://feeds.feedburner.com/TechCrunch/', category: 'Technology' },
+    // // Entertainment
+    // { url: 'http://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml', category: 'Entertainment' },
+    // { url: 'https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml', category: 'Entertainment' },
+    // // Sports
+    // { url: 'http://feeds.bbci.co.uk/sport/rss.xml', category: 'Sports' },
+    // { url: 'https://www.espn.com/espn/rss/news', category: 'Sports' },
+    // // Science
+    // { url: 'http://feeds.bbci.co.uk/news/science_and_environment/rss.xml', category: 'Science' },
+    // { url: 'https://www.sciencedaily.com/rss/top/science.xml', category: 'Science' },
+    // // Opinion
+    // { url: 'https://www.theguardian.com/uk/commentisfree/rss', category: 'Opinion' },
+    // { url: 'https://www.scmp.com/rss/91/feed', category: 'Opinion' },
+    // { url: 'https://www.project-syndicate.org/rss', category: 'Opinion' }
 ];
-
-async function polishContent(text: string, originalHeadline: string) {
-    if (!geminiKey) return { headline: originalHeadline, summary: text, category: "General", subcategory: "News" };
-
-    try {
-        const prompt = `
-          Act as a senior editor. Polish this news.
-          Input Headline: "${originalHeadline}"
-          Input Text: "${text}"
-          Output JSON ONLY: { "headline": "...", "summary": "...", "category": "...", "subcategory": "..." }
-        `;
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const jsonString = response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.error("AI Error:", e);
-        return { headline: originalHeadline, summary: text, category: "General", subcategory: "News" };
-    }
-}
-
-const CATEGORY_IMAGES: Record<string, string[]> = {
-    "World": [
-        "https://images.unsplash.com/photo-1529243856184-4f8c17728c47?w=800&q=80", // General News
-        "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80", // Globe
-        "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80"  // Newspaper
-    ],
-    "Business": [
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80", // Chart
-        "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&q=80", // Stock
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80"  // Skyscraper
-    ],
-    "Technology": [
-        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", // Chip
-        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80", // Code
-        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80"  // Matrix
-    ],
-    "Entertainment": [
-        "https://images.unsplash.com/photo-1499364615650-ec38552f4f34?w=800&q=80", // Concert
-        "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80", // Movie
-        "https://images.unsplash.com/photo-1514525253440-b393452e3720?w=800&q=80"  // Party
-    ],
-    "Sports": [
-        "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80", // Sport generic
-        "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80", // Football
-        "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80"  // Gym/Active
-    ],
-    "Science": [
-        "https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=800&q=80", // Microscope
-        "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80", // Lab
-        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80"  // Space
-    ],
-    "Health": [
-        "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80", // Stethoscope
-        "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800&q=80", // Healthy food
-        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80"  // Fitness
-    ],
-    "General": [
-        "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
-        "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&q=80",
-        "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&q=80"
-    ]
-};
-
-function getImageForCategory(category: string): string {
-    const images = CATEGORY_IMAGES[category] || CATEGORY_IMAGES["General"];
-    return images[Math.floor(Math.random() * images.length)];
-}
 
 function getRelatedImages(category: string, mainImage: string): string[] {
     const images = CATEGORY_IMAGES[category] || CATEGORY_IMAGES["General"];
-    // Return 2-3 images, ensuring we include the main one and some others
     const related = [mainImage];
     for (const img of images) {
         if (img !== mainImage && related.length < 3) {
@@ -128,78 +62,107 @@ function getRelatedImages(category: string, mainImage: string): string[] {
 }
 
 async function run() {
-    console.log("Starting test ingestion...");
-    console.log("Supabase URL:", supabaseUrl);
+    console.log("Starting robust manual ingestion...");
 
-    // Custom parser options to get media
-    const parser = new Parser({
-        customFields: {
-            item: [
-                ['media:content', 'mediaContent', { keepArray: true }],
-                ['media:group', 'mediaGroup'],
-                ['enclosure', 'enclosure']
-            ]
-        }
-    });
+    // Shuffle feeds to ensure variety
+    const shuffledFeeds = [...FEEDS].sort(() => Math.random() - 0.5);
 
-    for (const url of FEEDS) {
+    for (const feedConfig of shuffledFeeds) {
         try {
-            console.log(`Fetching ${url}...`);
-            const feed = await parser.parseURL(url);
+            console.log(`Fetching ${feedConfig.url} (${feedConfig.category})...`);
+            const feed = await parser.parseURL(feedConfig.url);
             console.log(`Found ${feed.items.length} items.`);
 
-            for (const item of feed.items) { // Process all items
+            // Process only first 3 items per feed
+            const itemsToProcess = feed.items.slice(0, 3);
+
+            for (const item of itemsToProcess) {
                 if (!item.link || !item.title) continue;
                 console.log(`Processing: ${item.title}`);
 
-                const polished = await polishContent(item.contentSnippet || "", item.title);
-                console.log(`Polished: ${polished.headline}`);
+                let polished;
+                try {
+                    polished = await polishContent(item.contentSnippet || item.content || "", item.title);
+                } catch (e) {
+                    console.error("AI Polish Error, using fallback:", e);
+                    polished = {
+                        headline: item.title,
+                        summary: (item.contentSnippet || "").substring(0, 200),
+                        category: feedConfig.category,
+                        subcategory: feedConfig.category,
+                        sentiment: 'Neutral',
+                        readTime: 5,
+                        content: item.content || ""
+                    };
+                }
+
+                // Fallback category if AI returns General or something else
+                if (!polished.category || polished.category === 'General') {
+                    polished.category = feedConfig.category;
+                    polished.subcategory = feedConfig.category; // Simple fallback
+                }
+
+                console.log(`Final Category: ${polished.category}`);
 
                 // Extract Image
                 let imageUrl = null;
-
-                // Try media:content
                 if (item.mediaContent && item.mediaContent.length > 0) {
                     imageUrl = item.mediaContent[0].$.url;
-                }
-                // Try enclosure
-                else if (item.enclosure && item.enclosure.url) {
+                } else if (item.enclosure && item.enclosure.url) {
                     imageUrl = item.enclosure.url;
-                }
-                // Try finding image in content
-                else if (item.content) {
+                } else if (item.content) {
                     const imgMatch = item.content.match(/<img[^>]+src="([^">]+)"/);
-                    if (imgMatch) {
-                        imageUrl = imgMatch[1];
-                    }
+                    if (imgMatch) imageUrl = imgMatch[1];
                 }
 
-                // Fallback if no image found
                 if (!imageUrl) {
                     imageUrl = getImageForCategory(polished.category);
                 }
 
                 const relatedImages = getRelatedImages(polished.category, imageUrl);
 
-                const { error } = await supabase.from('articles').upsert({
+                // Create fresh client for each request to avoid schema cache issues
+                const supabaseItem = createClient(supabaseUrl!, serviceRoleKey!, {
+                    auth: { persistSession: false }
+                });
+
+                const { error } = await supabaseItem.from('articles').upsert({
                     title: polished.headline,
                     url: item.link,
                     summary: polished.summary,
+                    content: polished.content || item.content || "",
                     source: feed.title || 'Unknown',
                     published_at: new Date().toISOString(),
                     category: polished.category,
                     subcategory: polished.subcategory,
                     image_url: imageUrl,
-                    images: relatedImages
+                    images: relatedImages,
+                    sentiment: polished.sentiment,
+                    // read_time: polished.readTime // Column missing in DB
                 }, { onConflict: 'url' });
 
                 if (error) console.error("DB Error:", error);
-                else console.log("Inserted successfully!");
+                else {
+                    console.log("Inserted/Updated successfully!");
+                    // Verify persistence
+                    const { data: verify } = await supabaseItem
+                        .from('articles')
+                        .select('category')
+                        .eq('url', item.link)
+                        .single();
+                    console.log(`VERIFY DB: URL=${item.link} Category=${verify?.category}`);
+                }
+
+                // Delay 1s
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
+            // Delay 2s between feeds
+            await new Promise(resolve => setTimeout(resolve, 2000));
         } catch (e) {
-            console.error("Feed Error:", e);
+            console.error(`Error fetching ${feedConfig.url}:`, e);
         }
     }
+    console.log("Ingestion complete!");
 }
 
 run();

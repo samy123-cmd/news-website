@@ -32,7 +32,11 @@ const FEEDS = [
     'https://www.espn.com/espn/rss/news',
     // Science
     'http://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
-    'https://www.sciencedaily.com/rss/top/science.xml'
+    'https://www.sciencedaily.com/rss/top/science.xml',
+    // Opinion
+    'https://www.theguardian.com/uk/commentisfree/rss',
+    'https://www.scmp.com/rss/91/feed',
+    'https://www.project-syndicate.org/rss'
 ];
 
 const CATEGORY_IMAGES: Record<string, string[]> = {
@@ -123,7 +127,7 @@ export async function GET(request: Request) {
 
     for (const url of shuffledFeeds) {
         // Break if we've processed enough for one run (to avoid timeout)
-        if (processedCount >= 5) break; // Reduced to 5 to allow time for full content fetching
+        if (processedCount >= 50) break; // Increased to 50 to ensure coverage across all categories
 
         try {
             const feed = await parser.parseURL(url);
@@ -201,6 +205,8 @@ export async function GET(request: Request) {
         } catch (e) {
             console.error(`Feed Error (${url}):`, e);
             errorCount++;
+            // Continue to next feed instead of crashing
+            continue;
         }
     }
 

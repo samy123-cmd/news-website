@@ -5,22 +5,29 @@ import { QuickReads } from "./QuickReads";
 export async function HeroSection() {
     const supabase = await createClient();
 
-    // Fetch featured article (latest one with an image)
-    const { data: featuredData } = await supabase
-        .from("articles")
-        .select("*")
-        .not("image_url", "is", null)
-        .order("published_at", { ascending: false })
-        .limit(1)
-        .single();
+    // Fetch featured and quick reads in parallel
+    const [featuredResult, quickReadsResult] = await Promise.all([
+        supabase
+            .from("articles")
+            .select("*")
+            .not("image_url", "is", null)
+            .order("published_at", { ascending: false })
+            .limit(1)
+            .single(),
+        supabase
+            .from("articles")
+            .select("id, title, source, published_at, url")
+            .order("published_at", { ascending: false })
+            .limit(6) // Fetch 6 to ensure we have enough even if we filter out the featured one
+    ]);
 
-    // Fetch quick reads (latest 5 articles, excluding the featured one if possible)
-    const { data: quickReadsData } = await supabase
-        .from("articles")
-        .select("id, title, source, published_at, url")
-        .neq("id", featuredData?.id || "")
-        .order("published_at", { ascending: false })
-        .limit(5);
+    const featuredData = featuredResult.data;
+    let quickReadsData = quickReadsResult.data || [];
+
+    // Filter out the featured article from quick reads
+    if (featuredData) {
+        quickReadsData = quickReadsData.filter(a => a.id !== featuredData.id).slice(0, 5);
+    }
 
     if (!featuredData) return null;
 

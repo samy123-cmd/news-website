@@ -15,13 +15,26 @@ export async function ArticleSidebar({ currentArticleId, category }: ArticleSide
     const supabase = await createClient();
 
     // Fetch related articles from the same category
-    const { data: relatedArticles } = await supabase
+    // Fetch related articles from the same category
+    let { data: relatedArticles } = await supabase
         .from("articles")
-        .select("id, title, published_at, source, image_url")
+        .select("id, title, published_at, source, image_url, category")
         .eq("category", category)
         .neq("id", currentArticleId)
         .order("published_at", { ascending: false })
         .limit(5);
+
+    // Fallback: If no related articles, fetch trending/recent news
+    if (!relatedArticles || relatedArticles.length === 0) {
+        const { data: fallbackArticles } = await supabase
+            .from("articles")
+            .select("id, title, published_at, source, image_url, category, views")
+            .neq("id", currentArticleId)
+            .order("views", { ascending: false }) // Sort by views for "Trending"
+            .order("published_at", { ascending: false }) // Secondary sort by date
+            .limit(5);
+        relatedArticles = fallbackArticles;
+    }
 
     return (
         <aside className="space-y-8">
@@ -42,7 +55,9 @@ export async function ArticleSidebar({ currentArticleId, category }: ArticleSide
             <div className="bg-card/50 border border-white/5 rounded-xl p-6 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-6">
                     <TrendingUp className="w-5 h-5 text-accent" />
-                    <h3 className="font-heading font-bold text-lg text-foreground">More in {category}</h3>
+                    <h3 className="font-heading font-bold text-lg text-foreground">
+                        {relatedArticles && relatedArticles.length > 0 && relatedArticles[0].category === category ? `More in ${category}` : "Trending Now"}
+                    </h3>
                 </div>
 
                 <div className="space-y-6">

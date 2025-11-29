@@ -188,7 +188,7 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex flex-col md:flex-row items-center gap-4 text-xs text-muted-foreground">
-                        <p>&copy; {new Date().getFullYear()} AI Global News. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} AI Global News. All rights reserved. Aggregated from verified sources for educational purposes.</p>
                         <span className="hidden md:inline text-white/10">|</span>
                         <div className="flex gap-4">
                             <Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy</Link>

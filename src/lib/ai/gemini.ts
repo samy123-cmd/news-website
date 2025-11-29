@@ -1,8 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-// Using gemini-1.5-flash for speed and cost efficiency
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 
 export async function summarizeText(text: string): Promise<string> {
     if (!process.env.GEMINI_API_KEY) {
@@ -11,6 +9,8 @@ export async function summarizeText(text: string): Promise<string> {
     }
 
     try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `Summarize the following news article in a concise, engaging way. Focus on the key facts and context. Use bullet points if appropriate. Keep it under 150 words.\n\n${text}`;
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -28,6 +28,8 @@ export async function translateText(text: string, targetLanguage: 'hi' | 'en'): 
     }
 
     try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `Translate the following text to ${targetLanguage === 'hi' ? 'Hindi' : 'English'}. Maintain the tone and style of a news article. Output ONLY the translated text.\n\n${text}`;
         const result = await model.generateContent(prompt);
         const response = await result.response;

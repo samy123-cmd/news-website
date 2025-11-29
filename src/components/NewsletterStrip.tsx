@@ -47,7 +47,7 @@ export function NewsletterStrip() {
     };
 
     return (
-        <div className="w-full bg-[#0b1624] border-y border-white/10 py-4 sticky top-16 z-40 shadow-2xl backdrop-blur-xl bg-opacity-95">
+        <div className="w-full bg-[#0b1624] border-y border-white/10 py-4 shadow-2xl backdrop-blur-xl bg-opacity-95 rounded-xl">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
 

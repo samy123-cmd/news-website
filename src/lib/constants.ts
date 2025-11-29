@@ -38,6 +38,11 @@ export const CATEGORY_IMAGES: Record<string, string[]> = {
         "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
         "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&q=80",
         "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&q=80"
+    ],
+    "Opinion": [
+        "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80", // Writing/Journal
+        "https://images.unsplash.com/photo-1576670159805-381a9de1e243?w=800&q=80", // Debate/Discussion
+        "https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=800&q=80"  // Megaphone/Voice
     ]
 };
 

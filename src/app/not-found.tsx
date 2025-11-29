@@ -1,25 +1,29 @@
-"use client";
-
 import Link from 'next/link';
-import { FileQuestion, Home } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { FileQuestion } from 'lucide-react';
 
 export default function NotFound() {
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground p-4">
-            <div className="max-w-md w-full bg-card border border-border rounded-2xl p-8 text-center shadow-xl">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <FileQuestion className="w-8 h-8 text-primary" />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Page Not Found</h2>
-                <p className="text-muted-foreground mb-8">
-                    Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved or deleted.
+        <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-8 px-4">
+            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center animate-pulse">
+                <FileQuestion className="w-12 h-12 text-muted-foreground" />
+            </div>
+
+            <div className="space-y-4 max-w-lg">
+                <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground">
+                    Page Not Found
+                </h1>
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                    The story you're looking for seems to have expired or moved.
+                    Our AI is constantly updating, so it might be old news.
                 </p>
-                <Link
-                    href="/"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90 transition-colors"
-                >
-                    <Home className="w-4 h-4" />
-                    Back to Home
+            </div>
+
+            <div className="flex gap-4">
+                <Link href="/">
+                    <Button size="lg" className="rounded-full px-8">
+                        Back to Headlines
+                    </Button>
                 </Link>
             </div>
         </div>

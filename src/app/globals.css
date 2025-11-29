@@ -74,6 +74,36 @@
   /* Tighter headings */
 }
 
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #0f172a;
+
+  --primary: #0284c7;
+  /* Sky 600 - Darker for light mode contrast */
+  --primary-foreground: #ffffff;
+
+  --secondary: #94a3b8;
+  --secondary-foreground: #0f172a;
+
+  --accent: #d97706;
+  /* Amber 600 */
+  --accent-foreground: #ffffff;
+
+  --card: #f8fafc;
+  /* Slate 50 */
+  --card-foreground: #0f172a;
+
+  --border: #e2e8f0;
+  /* Slate 200 */
+  --muted: #f1f5f9;
+  /* Slate 100 */
+  --muted-foreground: #64748b;
+  /* Slate 500 */
+
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+}
+
 html {
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
@@ -132,9 +162,26 @@ h3,
   animation: ticker 60s linear infinite;
 }
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  @apply bg-background text-foreground;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(30, 167, 255, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.08), transparent 25%);
+  background-attachment: fixed;
   font-family: var(--font-sans);
 }
 

@@ -9,25 +9,30 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import JsonLd from "@/components/seo/JsonLd";
 import { Analytics } from "@vercel/analytics/react";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const notoSansDevanagari = Noto_Sans_Devanagari({
   variable: "--font-noto-sans-devanagari",
   subsets: ["devanagari"],
+  display: "swap",
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://global-ai-news.com";
@@ -38,29 +43,29 @@ export const metadata: Metadata = {
     default: "Global AI News | Premium Aggregator",
     template: "%s | Global AI News",
   },
-  description: "Real-time AI-curated news from around the world. Unbiased, verified, and premium journalism.",
-  keywords: ["AI News", "Global News", "Tech News", "World News", "Artificial Intelligence", "Journalism"],
+  description: "Experience the future of news. Real-time, AI-curated journalism from verified global sources. Unbiased, comprehensive, and premium.",
+  keywords: ["AI News", "Global News", "Tech News", "World News", "Artificial Intelligence", "Journalism", "Verified News", "Premium News"],
   authors: [{ name: "Global AI News Team" }],
   openGraph: {
-    title: "Global AI News",
-    description: "Real-time AI-curated news from around the world.",
+    title: "Global AI News | The Future of Journalism",
+    description: "Real-time, AI-curated journalism from verified global sources. Unbiased, comprehensive, and premium.",
     url: BASE_URL,
     siteName: "Global AI News",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/og-image.jpg", // We need to ensure this image exists or use a placeholder
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Global AI News",
+        alt: "Global AI News Preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Global AI News",
-    description: "Real-time AI-curated news from around the world.",
+    description: "Real-time, AI-curated journalism from verified global sources.",
     creator: "@globalainews",
     images: ["/og-image.jpg"],
   },
@@ -75,7 +80,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-
   alternates: {
     canonical: BASE_URL,
     languages: {
@@ -94,23 +98,26 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${notoSansDevanagari.variable} font-sans antialiased bg-background text-foreground`}
+        suppressHydrationWarning
       >
         <JsonLd />
-        <LanguageProvider>
-          <ToastProvider>
-            <div className="flex flex-col min-h-screen">
-              <TopBar />
-              <Suspense fallback={<div className="h-20 bg-background/80 backdrop-blur-md border-b border-white/10" />}>
-                <Header />
-              </Suspense>
-              <main className="flex-grow">
-                {children}
-                <Analytics />
-              </main>
-              <Footer />
-            </div>
-          </ToastProvider>
-        </LanguageProvider>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
+          <LanguageProvider>
+            <ToastProvider>
+              <div className="flex flex-col min-h-screen">
+                <TopBar />
+                <Suspense fallback={<div className="h-20 bg-background/80 backdrop-blur-md border-b border-white/10" />}>
+                  <Header />
+                </Suspense>
+                <main className="flex-grow">
+                  {children}
+                  <Analytics />
+                </main>
+                <Footer />
+              </div>
+            </ToastProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
