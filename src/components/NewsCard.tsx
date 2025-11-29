@@ -168,8 +168,15 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                     </div>
 
                     {/* Hover Action Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1624] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-end justify-center pb-6 z-30">
-                        <Link href={`/article/${article.id}`} className="text-primary text-xs font-bold flex items-center gap-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto cursor-pointer">
+                    {/* Hover Action Overlay - Visual Gradient */}
+                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1624] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20" />
+
+                    {/* Read Full Story Link - Interactive Layer */}
+                    <div className="absolute inset-x-0 bottom-6 flex justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                        <Link
+                            href={`/article/${article.id}`}
+                            className="text-primary text-xs font-bold flex items-center gap-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto cursor-pointer bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 hover:bg-black/40"
+                        >
                             Read Full Story <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
