@@ -27,7 +27,10 @@ export async function polishContent(text: string, originalHeadline: string): Pro
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({
+        model: "gemini-2.0-flash",
+        generationConfig: { responseMimeType: "application/json" }
+    });
 
     try {
         const prompt = `
@@ -43,7 +46,7 @@ export async function polishContent(text: string, originalHeadline: string): Pro
       4. **Categorize**: Assign a main Category (e.g., World, Politics, Business, Tech, Sports, Entertainment, Science, Opinion) and a specific Subcategory (e.g., Cricket, AI, Bollywood, Elections, Editorials).
       5. **Analyze**: Determine sentiment and estimate read time.
 
-      Output JSON ONLY:
+      Output JSON ONLY. Ensure all strings are properly escaped.
       {
         "headline": "...",
         "summary": "...",
@@ -57,7 +60,7 @@ export async function polishContent(text: string, originalHeadline: string): Pro
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const jsonString = response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+        const jsonString = response.text();
 
         return JSON.parse(jsonString);
     } catch (error) {

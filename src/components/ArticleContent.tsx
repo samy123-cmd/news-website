@@ -5,6 +5,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { Sparkles, ExternalLink, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Button } from "@/components/ui/Button";
 
 interface ArticleContentProps {
     article: any;
@@ -159,10 +160,10 @@ export async function ArticleContent({ article }: ArticleContentProps) {
             <div className="mt-16 p-8 bg-white/5 rounded-2xl border border-white/10 text-center">
                 <MessageSquare className="w-8 h-8 text-primary mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Join the Conversation</h3>
-                <p className="text-muted-foreground mb-6">Sign in to share your thoughts on this story.</p>
-                <Link href="/login" className="inline-flex items-center justify-center h-10 px-6 rounded-full bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
-                    Sign In
-                </Link>
+                <p className="text-muted-foreground mb-6">Subscribe to our newsletter for daily updates.</p>
+                <Button className="inline-flex items-center justify-center h-10 px-6 rounded-full bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
+                    Subscribe
+                </Button>
             </div>
         </div>
     );

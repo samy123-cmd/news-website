@@ -32,9 +32,9 @@ export async function HeroSection() {
     if (!featuredData) return null;
 
     return (
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[600px]">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[500px]">
             {/* Hero Content - Desktop: Left 60%, Mobile: Top */}
-            <div className="lg:col-span-8 h-[500px] lg:h-full relative rounded-2xl overflow-hidden group">
+            <div className="lg:col-span-8 min-h-[500px] relative rounded-2xl overflow-hidden group">
                 <FeaturedArticle article={featuredData} />
             </div>
 

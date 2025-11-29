@@ -40,6 +40,7 @@ export async function getLatestNews(category: string) {
         .from('articles')
         .select('*')
         .gt('published_at', thirtyMinutesAgo)
+        .eq('status', 'published')
         .order('published_at', { ascending: false })
         .limit(20);
 

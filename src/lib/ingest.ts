@@ -209,8 +209,9 @@ export async function fetchNewsByCategory(category: string) {
                     source: a.source,
                     category: a.category
                     // read_time: a.read_time // Column missing in DB
+                    // status: 'published' - relying on DB default
                 })),
-                { onConflict: 'id' }
+                { onConflict: 'url' }
             );
 
         if (error) {

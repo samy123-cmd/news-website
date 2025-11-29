@@ -91,7 +91,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
 
       {/* Trending Bar */}
-      <div className="mt-12">
+      <div className="mt-16 relative z-10">
         <TrendingBar />
       </div>
 

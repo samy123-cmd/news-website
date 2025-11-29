@@ -125,8 +125,9 @@ export async function ingestNews() {
                     image_url: imageUrl,
                     images: relatedImages,
                     sentiment: polished.sentiment,
-                    read_time: polished.readTime
-                }, { onConflict: 'url' });
+                    read_time: polished.readTime,
+                    // status: 'published' - relying on DB default
+                } as any, { onConflict: 'url' });
 
                 if (!error) {
                     results.push(polished.headline);

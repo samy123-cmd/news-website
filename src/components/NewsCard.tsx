@@ -169,9 +169,9 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
 
                     {/* Hover Action Overlay */}
                     <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1624] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-end justify-center pb-6 z-10">
-                        <span className="text-primary text-xs font-bold flex items-center gap-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <Link href={`/article/${article.id}`} className="text-primary text-xs font-bold flex items-center gap-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto cursor-pointer">
                             Read Full Story <ArrowRight className="w-3 h-3" />
-                        </span>
+                        </Link>
                     </div>
                 </div>
             </motion.div>

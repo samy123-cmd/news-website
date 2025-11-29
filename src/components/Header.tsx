@@ -151,9 +151,13 @@ export function Header() {
                         </button>
                         <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-                        <Button variant="ghost" className="text-sm font-bold text-foreground hover:text-primary" asChild>
-                            <Link href="/login">Sign In</Link>
-                        </Button>
+                        <Link
+                            href="/submit"
+                            className="hidden md:flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                        >
+                            Submit Article
+                        </Link>
+
                         <Button size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 rounded-full px-6 font-bold relative overflow-hidden group">
                             <span className="relative z-10">Subscribe</span>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
@@ -284,9 +288,6 @@ export function Header() {
                                 </motion.div>
                             ))}
                             <div className="flex flex-col gap-3 mt-6">
-                                <Button variant="outline" className="w-full justify-center h-12" asChild>
-                                    <Link href="/login">Sign In</Link>
-                                </Button>
                                 <Button className="w-full justify-center h-12 bg-primary text-white font-bold shadow-lg shadow-primary/20">Subscribe Now</Button>
                             </div>
                         </nav>

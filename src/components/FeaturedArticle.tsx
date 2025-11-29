@@ -28,7 +28,7 @@ export function FeaturedArticle({ article }: { article: Article }) {
     };
 
     return (
-        <div className="relative group w-full h-full min-h-[500px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+        <div className="relative group w-full h-full min-h-[400px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
             {/* Full Bleed Image */}
             <Link href={`/article/${article.id}`} onClick={handleArticleClick} className="absolute inset-0 z-10 block cursor-pointer">
                 {article.image_url ? (
