@@ -150,17 +150,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         <div className="flex items-center gap-6 text-sm text-gray-300 border-t border-white/10 pt-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white border border-white/20">
-                                    {article.source?.substring(0, 2).toUpperCase()}
+                                    {(article.source || "GN").substring(0, 2).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-white">{article.source}</p>
+                                    <p className="font-bold text-white">{article.source || "Global News"}</p>
                                     <p className="text-xs text-gray-400">Verified Source</p>
                                 </div>
                             </div>
                             <div className="h-8 w-px bg-white/10" />
                             <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-primary" />
-                                <span>{formatDistanceToNow(new Date(article.published_at), { addSuffix: true })}</span>
+                                <span>
+                                    {article.published_at
+                                        ? formatDistanceToNow(new Date(article.published_at), { addSuffix: true })
+                                        : "Recently"}
+                                </span>
                             </div>
                             {article.url && (
                                 <>

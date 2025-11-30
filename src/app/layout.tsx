@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { LanguageProvider } from "@/lib/context/LanguageContext";
+import { BookmarkProvider } from "@/lib/context/BookmarkContext";
 import { TopBar } from "@/components/TopBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -104,19 +105,21 @@ export default function RootLayout({
         <JsonLd />
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
           <LanguageProvider>
-            <ToastProvider>
-              <div className="flex flex-col min-h-screen">
-                <TopBar />
-                <Suspense fallback={<div className="h-20 bg-background/80 backdrop-blur-md border-b border-white/10" />}>
-                  <Header />
-                </Suspense>
-                <main className="flex-grow">
-                  {children}
-                  <Analytics />
-                </main>
-                <Footer />
-              </div>
-            </ToastProvider>
+            <BookmarkProvider>
+              <ToastProvider>
+                <div className="flex flex-col min-h-screen">
+                  <TopBar />
+                  <Suspense fallback={<div className="h-20 bg-background/80 backdrop-blur-md border-b border-white/10" />}>
+                    <Header />
+                  </Suspense>
+                  <main className="flex-grow">
+                    {children}
+                    <Analytics />
+                  </main>
+                  <Footer />
+                </div>
+              </ToastProvider>
+            </BookmarkProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

@@ -6,7 +6,11 @@ type EventName =
     | 'newsletter_subscribe'
     | 'ad_impression'
     | 'share_click'
-    | 'bookmark_click';
+    | 'share_native'
+    | 'share_copy'
+    | 'bookmark_click'
+    | 'bookmark_add'
+    | 'bookmark_remove';
 
 interface EventProperties {
     [key: string]: string | number | boolean;
@@ -20,6 +24,10 @@ export const analytics = {
         }
 
         // Track with Vercel Analytics
-        track(name, properties);
+        try {
+            track(name, properties);
+        } catch (e) {
+            console.warn(`[Analytics] Failed to track ${name}`, e);
+        }
     }
 };
