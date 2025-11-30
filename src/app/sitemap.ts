@@ -27,76 +27,77 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'hourly',
             priority: 1,
         },
-        url: `${BASE_URL}/about`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.5,
-        },
-{
-    url: `${BASE_URL}/careers`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/about`,
+            lastModified: new Date(),
             changeFrequency: 'monthly',
-                priority: 0.5,
+            priority: 0.5,
         },
-{
-    url: `${BASE_URL}/contact-us`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/careers`,
+            lastModified: new Date(),
             changeFrequency: 'monthly',
-                priority: 0.5,
+            priority: 0.5,
         },
-{
-    url: `${BASE_URL}/site-map`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/contact-us`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.5,
+        },
+        {
+            url: `${BASE_URL}/site-map`,
+            lastModified: new Date(),
             changeFrequency: 'weekly',
-                priority: 0.6,
+            priority: 0.6,
         },
-{
-    url: `${BASE_URL}/advertisers`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/advertisers`,
+            lastModified: new Date(),
             changeFrequency: 'monthly',
-                priority: 0.5,
+            priority: 0.5,
         },
-{
-    url: `${BASE_URL}/press-center`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/press-center`,
+            lastModified: new Date(),
             changeFrequency: 'monthly',
-                priority: 0.5,
+            priority: 0.5,
         },
-{
-    url: `${BASE_URL}/developer-api`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/developer-api`,
+            lastModified: new Date(),
             changeFrequency: 'monthly',
-                priority: 0.5,
+            priority: 0.5,
         },
-{
-    url: `${BASE_URL}/rss-feeds`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/rss-feeds`,
+            lastModified: new Date(),
             changeFrequency: 'weekly',
-                priority: 0.6,
+            priority: 0.6,
         },
-{
-    url: `${BASE_URL}/newsletters`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/newsletters`,
+            lastModified: new Date(),
             changeFrequency: 'weekly',
-                priority: 0.6,
+            priority: 0.6,
         },
-{
-    url: `${BASE_URL}/accessibility`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/accessibility`,
+            lastModified: new Date(),
             changeFrequency: 'yearly',
-                priority: 0.4,
+            priority: 0.4,
         },
-{
-    url: `${BASE_URL}/cookie-policy`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/cookie-policy`,
+            lastModified: new Date(),
             changeFrequency: 'yearly',
-                priority: 0.4,
+            priority: 0.4,
         },
-{
-    url: `${BASE_URL}/apps`,
-        lastModified: new Date(),
+        {
+            url: `${BASE_URL}/apps`,
+            lastModified: new Date(),
             changeFrequency: 'monthly',
-                priority: 0.5,
+            priority: 0.5,
         },
         ...articleUrls,
     ];
