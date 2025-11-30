@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Share2, Bookmark, Clock, ExternalLink, MessageSquare, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, ExternalLink, MessageSquare, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
 import { ArticleSidebar } from '@/components/ArticleSidebar';
@@ -14,6 +14,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { SidebarSkeleton } from '@/components/SidebarSkeleton';
 import { ViewTracker } from '@/components/ViewTracker';
+import { ArticleActions } from '@/components/ArticleActions';
 
 // Force dynamic rendering for this page
 // Use ISR for better performance
@@ -101,14 +102,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         <span className="font-bold text-sm">Back to Feed</span>
                     </Link>
-                    <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary" title="Save for later" aria-label="Save article for later">
-                            <Bookmark className="w-5 h-5" />
-                        </button>
-                        <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary" title="Share" aria-label="Share article">
-                            <Share2 className="w-5 h-5" />
-                        </button>
-                    </div>
+                    <ArticleActions article={article} />
                 </div>
             </nav>
 

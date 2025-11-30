@@ -45,12 +45,17 @@ async function getOgImage(link: string): Promise<string | null> {
 // 1b. Helper to scrape full article content
 export async function scrapeArticleContent(url: string): Promise<string> {
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
         const response = await fetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             },
-            next: { revalidate: 3600 }
+            next: { revalidate: 3600 },
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (!response.ok) return "";
 

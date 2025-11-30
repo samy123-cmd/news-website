@@ -70,7 +70,16 @@ export async function polishContent(text: string, originalHeadline: string): Pro
       }
     `;
 
-        const result = await model.generateContent(prompt);
+        // Add timeout for AI generation
+        const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("AI generation timeout")), 15000)
+        );
+
+        const result = await Promise.race([
+            model.generateContent(prompt),
+            timeoutPromise
+        ]) as any;
+
         const response = await result.response;
         const jsonString = response.text();
 

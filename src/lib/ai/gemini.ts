@@ -12,7 +12,16 @@ export async function summarizeText(text: string): Promise<string> {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `Summarize the following news article in a concise, engaging way. Focus on the key facts and context. Use bullet points if appropriate. Keep it under 150 words.\n\n${text}`;
-        const result = await model.generateContent(prompt);
+        // Add timeout for AI generation
+        const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("AI generation timeout")), 10000)
+        );
+
+        const result = await Promise.race([
+            model.generateContent(prompt),
+            timeoutPromise
+        ]) as any;
+
         const response = await result.response;
         return response.text();
     } catch (error) {
@@ -31,7 +40,16 @@ export async function translateText(text: string, targetLanguage: 'hi' | 'en'): 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `Translate the following text to ${targetLanguage === 'hi' ? 'Hindi' : 'English'}. Maintain the tone and style of a news article. Output ONLY the translated text.\n\n${text}`;
-        const result = await model.generateContent(prompt);
+        // Add timeout for AI generation
+        const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("AI generation timeout")), 10000)
+        );
+
+        const result = await Promise.race([
+            model.generateContent(prompt),
+            timeoutPromise
+        ]) as any;
+
         const response = await result.response;
         return response.text();
     } catch (error) {
