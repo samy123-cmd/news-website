@@ -34,27 +34,39 @@ export async function polishContent(text: string, originalHeadline: string): Pro
 
     try {
         const prompt = `
-      Act as a senior editor for a premium news agency (like BBC/CNN). 
-      Your task is to "polish" the following news content.
+      Act as a senior editor for a premium news agency (like BBC/CNN/Reuters). 
+      Your task is to "polish" the following news content into a high-quality, engaging article.
       
       Input Headline: "${originalHeadline}"
       Input Text: "${text}"
 
-      1. **Refine the Headline**: Make it punchy, professional, and SEO-friendly.
-      2. **Summarize**: Create a "Key Takeaways" style summary (max 150 words).
-      3. **Write Article**: Write a detailed, engaging, and comprehensive news article (at least 400-600 words) based on the input. Use HTML formatting (<h3> for subheadings, <p> for paragraphs, <ul>/<li> for lists). Do NOT use <h1> or <h2>. Make it sound authoritative and premium.
-      4. **Categorize**: Assign a main Category (e.g., World, Politics, Business, Tech, Sports, Entertainment, Science, Opinion) and a specific Subcategory (e.g., Cricket, AI, Bollywood, Elections, Editorials).
-      5. **Analyze**: Determine sentiment and estimate read time.
+      1. **Refine the Headline**: Create a compelling, click-worthy, yet credible headline. Avoid clickbait, but make it intriguing. Max 15 words.
+      2. **Summarize**: Create a "Key Takeaways" style summary (bullet points preferred, max 150 words).
+      3. **Write Article**: Write a detailed, engaging, and comprehensive news article (at least 400-600 words). 
+         - Use HTML formatting: <h3> for subheadings, <p> for paragraphs, <ul>/<li> for lists. 
+         - Do NOT use <h1> or <h2>. 
+         - Adopt a neutral, authoritative, yet accessible tone.
+         - **LANGUAGE RULE**: If the input text is in Hindi, the output (Headline, Summary, Article) MUST be in Hindi. Do NOT translate Hindi inputs to English.
+      4. **Categorize**: Assign a main Category from this EXACT list: [World, Politics, Business, Technology, Sports, Entertainment, Science, Opinion, India]. 
+         - If it's specifically about Indian national news, politics, or events, use "India".
+         - If it's about space/nature/discovery, use "Science".
+         - If it's a review/gadget/software, use "Technology".
+         - If it's a movie/celebrity, use "Entertainment".
+         - If it's a match/player, use "Sports".
+         - If it's an editorial/commentary, use "Opinion".
+         - ONLY use "General" if it absolutely fits none of the above.
+      5. **Subcategory**: Choose a specific, relevant subcategory (e.g., AI, Space, Cricket, Hollywood, Elections, Markets).
+      6. **Analyze**: Determine sentiment (positive/neutral/negative) and estimate read time (e.g., "4 min").
 
-      Output JSON ONLY. Ensure all strings are properly escaped.
+      Output JSON ONLY. Ensure all strings are properly escaped to be valid JSON.
       {
         "headline": "...",
         "summary": "...",
         "content": "...",
         "category": "...",
         "subcategory": "...",
-        "sentiment": "positive|neutral|negative",
-        "readTime": "X min"
+        "sentiment": "...",
+        "readTime": "..."
       }
     `;
 

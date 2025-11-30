@@ -16,7 +16,9 @@ import { SidebarSkeleton } from '@/components/SidebarSkeleton';
 import { ViewTracker } from '@/components/ViewTracker';
 
 // Force dynamic rendering for this page
-export const dynamic = 'force-dynamic';
+// Use ISR for better performance
+export const revalidate = 60;
+export const dynamicParams = true;
 
 interface ArticlePageProps {
     params: Promise<{ id: string }>;

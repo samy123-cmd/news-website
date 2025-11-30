@@ -39,7 +39,7 @@ export function QuickReads({ articles }: { articles: Article[] }) {
                                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded-full">
                                     {article.source}
                                 </span>
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
                                     {new Date(article.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </div>

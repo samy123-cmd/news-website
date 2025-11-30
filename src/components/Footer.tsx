@@ -27,14 +27,14 @@ const COMPANY_LINKS = [
     { label: "Code of Ethics", href: "/code-of-ethics", description: "Our commitment to unbiased journalism" },
     { label: "Privacy Policy", href: "/privacy-policy", description: "How we protect your data" },
     { label: "Terms of Service", href: "/terms-of-service", description: "Rules for using our platform" },
-    { label: "Cookie Policy", href: "/privacy-policy", description: "Information about our cookie usage" },
-    { label: "Accessibility", href: "/help-center", description: "Our commitment to inclusive design" },
-    { label: "Contact Us", href: "/help-center", description: "Get in touch with our support team" },
+    { label: "Cookie Policy", href: "/cookie-policy", description: "Information about our cookie usage" },
+    { label: "Accessibility", href: "/accessibility", description: "Our commitment to inclusive design" },
+    { label: "Contact Us", href: "/contact-us", description: "Get in touch with our support team" },
 ];
 
 const RESOURCE_LINKS = [
     { label: "Help Center", href: "/help-center", description: "Guides and FAQs for using the platform" },
-    { label: "Sitemap", href: "/sitemap", description: "Overview of our website structure" },
+    { label: "Sitemap", href: "/site-map", description: "Overview of our website structure" },
     { label: "Advertisers", href: "/advertisers", description: "Partner with us for advertising" },
     { label: "Press Center", href: "/press-center", description: "Resources for media and press" },
     { label: "Developer API", href: "/developer-api", description: "Access our news data programmatically" },
@@ -75,24 +75,18 @@ export function Footer() {
                                     The world&apos;s first AI-powered premium news aggregator. Delivering real-time, unbiased, and polished journalism from across the globe.
                                 </p>
                             </div>
-
-                            <div className="space-y-4">
-                                <h5 className="text-sm font-bold text-foreground">Subscribe to our Newsletter</h5>
-                                <NewsletterForm />
-                            </div>
-
                             <div className="space-y-4">
                                 <h5 className="text-sm font-bold text-foreground">Get the App</h5>
                                 <div className="flex gap-3">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button variant="outline" className="h-12 px-4 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-left flex items-center gap-3 transition-all hover:scale-105">
+                                            <Link href="/apps" className="h-12 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-md text-left flex items-center gap-3 transition-all hover:scale-105">
                                                 <Smartphone className="w-6 h-6 text-primary" />
                                                 <div className="flex flex-col items-start leading-none">
                                                     <span className="text-[10px] text-muted-foreground">Download on the</span>
                                                     <span className="text-sm font-bold">App Store</span>
                                                 </div>
-                                            </Button>
+                                            </Link>
                                         </TooltipTrigger>
                                         <TooltipContent side="bottom">
                                             <p>Download for iOS devices</p>
@@ -101,13 +95,13 @@ export function Footer() {
 
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button variant="outline" className="h-12 px-4 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-left flex items-center gap-3 transition-all hover:scale-105">
+                                            <Link href="/apps" className="h-12 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-md text-left flex items-center gap-3 transition-all hover:scale-105">
                                                 <Download className="w-6 h-6 text-primary" />
                                                 <div className="flex flex-col items-start leading-none">
                                                     <span className="text-[10px] text-muted-foreground">Get it on</span>
                                                     <span className="text-sm font-bold">Google Play</span>
                                                 </div>
-                                            </Button>
+                                            </Link>
                                         </TooltipTrigger>
                                         <TooltipContent side="bottom">
                                             <p>Download for Android devices</p>
@@ -117,7 +111,7 @@ export function Footer() {
                             </div>
                         </div>
 
-                        {/* Links Column 1 */}
+                        {/* Links Column 1: Editions */}
                         <div>
                             <h4 className="font-bold text-foreground mb-6">Editions</h4>
                             <ul className="space-y-3 text-sm text-muted-foreground">
@@ -139,7 +133,7 @@ export function Footer() {
                             </ul>
                         </div>
 
-                        {/* Links Column 2 */}
+                        {/* Links Column 2: Company */}
                         <div>
                             <h4 className="font-bold text-foreground mb-6">Company</h4>
                             <ul className="space-y-3 text-sm text-muted-foreground">
@@ -149,28 +143,6 @@ export function Footer() {
                                             <TooltipTrigger asChild>
                                                 <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
                                                     <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-primary transition-colors" />
-                                                    {item.label}
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
-                                                <p>{item.description}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Links Column 3 */}
-                        <div>
-                            <h4 className="font-bold text-foreground mb-6">Resources</h4>
-                            <ul className="space-y-3 text-sm text-muted-foreground">
-                                {RESOURCE_LINKS.map((item) => (
-                                    <li key={item.label}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
-                                                    <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 text-primary" />
                                                     {item.label}
                                                 </Link>
                                             </TooltipTrigger>
@@ -217,6 +189,6 @@ export function Footer() {
                     </div>
                 </div>
             </footer>
-        </TooltipProvider>
+        </TooltipProvider >
     );
 }

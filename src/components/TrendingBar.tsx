@@ -100,15 +100,7 @@ export function TrendingBar() {
                             Local
                         </button>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-muted-foreground hover:text-primary gap-2"
-                        onClick={() => setCustomizeOpen(true)}
-                    >
-                        <SlidersHorizontal className="w-3.5 h-3.5" />
-                        Customize
-                    </Button>
+
                 </div>
             </div>
 

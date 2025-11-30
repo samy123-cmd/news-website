@@ -89,6 +89,7 @@ export const metadata: Metadata = {
   },
 };
 
+// Force rebuild
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -97,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${notoSansDevanagari.variable} font-sans antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${notoSansDevanagari.variable} font-sans antialiased bg-background text-foreground overflow-x-hidden`}
         suppressHydrationWarning
       >
         <JsonLd />

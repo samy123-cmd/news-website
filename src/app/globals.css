@@ -61,17 +61,19 @@
   --popover: #1E293B;
   --popover-foreground: #F8FAFC;
 
-  /* Typography Scale - More dramatic hierarchy */
-  --font-size-base: 16px;
-  --h1: 3.5rem;
-  /* Larger, more impactful */
-  --h2: 2.5rem;
-  --h3: 1.75rem;
+  /* Typography Scale - Fluid Typography using clamp() */
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  /* 16px -> 18px */
+
+  --h1: clamp(2.5rem, 2rem + 2.5vw, 4rem);
+  /* 40px -> 64px */
+  --h2: clamp(2rem, 1.75rem + 1.25vw, 3rem);
+  /* 32px -> 48px */
+  --h3: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+  /* 24px -> 36px */
 
   --line-height-base: 1.7;
-  /* Relaxed reading experience */
   --line-height-heading: 1.1;
-  /* Tighter headings */
 }
 
 [data-theme="light"] {
@@ -79,26 +81,20 @@
   --foreground: #0f172a;
 
   --primary: #0284c7;
-  /* Sky 600 - Darker for light mode contrast */
   --primary-foreground: #ffffff;
 
   --secondary: #94a3b8;
   --secondary-foreground: #0f172a;
 
   --accent: #d97706;
-  /* Amber 600 */
   --accent-foreground: #ffffff;
 
   --card: #f8fafc;
-  /* Slate 50 */
   --card-foreground: #0f172a;
 
   --border: #e2e8f0;
-  /* Slate 200 */
   --muted: #f1f5f9;
-  /* Slate 100 */
   --muted-foreground: #64748b;
-  /* Slate 500 */
 
   --popover: #ffffff;
   --popover-foreground: #0f172a;
@@ -107,6 +103,8 @@
 html {
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 h1,
@@ -125,6 +123,13 @@ h3,
 .h3 {
   font-size: var(--h3);
   line-height: var(--line-height-heading);
+}
+
+/* Custom Selection */
+::selection {
+  background: rgba(56, 189, 248, 0.3);
+  /* Primary color with opacity */
+  color: inherit;
 }
 
 /* Glassmorphism Utilities */
@@ -185,20 +190,25 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Scrollbar */
+/* Refined Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  /* Slimmer */
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--muted);
-  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.3);
+  /* Subtle slate */
+  border-radius: 10px;
+  transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: rgba(56, 189, 248, 0.6);
+  /* Primary on hover */
 }

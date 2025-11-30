@@ -18,6 +18,7 @@ import { formatDistanceToNow } from "date-fns";
 import { analytics } from "@/lib/analytics";
 
 import { getImageForCategory } from "@/lib/constants";
+import { stripHtml } from "@/lib/utils/text";
 
 interface Article {
     id: string;
@@ -62,7 +63,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="group flex flex-col h-full overflow-hidden rounded-xl glass-card border border-white/5 hover:border-primary/50 hover:shadow-[0_10px_40px_-10px_rgba(30,167,255,0.2)] transition-all duration-500 hover:-translate-y-2 relative"
+                className="group flex flex-col h-full overflow-hidden rounded-xl glass-card border border-white/5 hover:border-primary/50 hover:shadow-[0_0_30px_-5px_rgba(30,167,255,0.3)] transition-all duration-500 hover:-translate-y-2 relative"
             >
                 {/* Image Section */}
                 <Link href={`/article/${article.id}`} onClick={handleArticleClick} className="relative h-52 overflow-hidden block cursor-pointer">
@@ -146,7 +147,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                         </Tooltip>
 
                         <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed font-serif">
-                            {displaySummary || "No summary available."}
+                            {stripHtml(displaySummary || "No summary available.")}
                         </p>
                     </div>
 
@@ -167,15 +168,15 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                         </div>
                     </div>
 
-                    {/* Hover Action Overlay */}
                     {/* Hover Action Overlay - Visual Gradient */}
                     <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1624] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20" />
 
                     {/* Read Full Story Link - Interactive Layer */}
-                    <div className="absolute inset-x-0 bottom-6 flex justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    {/* Always visible on mobile (opacity-100), hover-only on desktop (md:opacity-0) */}
+                    <div className="absolute inset-x-0 bottom-6 flex justify-center z-30 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none md:pointer-events-auto">
                         <Link
                             href={`/article/${article.id}`}
-                            className="text-primary text-xs font-bold flex items-center gap-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto cursor-pointer bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 hover:bg-black/40"
+                            className="relative z-40 text-primary text-xs font-bold flex items-center gap-1 translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto cursor-pointer bg-black/40 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 hover:bg-primary hover:text-white hover:border-primary/50 shadow-lg"
                         >
                             Read Full Story <ArrowRight className="w-3 h-3" />
                         </Link>

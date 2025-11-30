@@ -1,10 +1,20 @@
 {
-  "total": 668,
+  "total": 804,
   "categories": {
+    "Business": 8,
+    "entertainment": 20,
+    "Entertainment": 5,
+    "General": 642,
+    "Opinion": 3,
+    "politics": 15,
+    "Politics": 3,
+    "Science": 21,
+    "sports": 44,
+    "Sports": 2,
+    "Tech": 3,
+    "technology": 26,
     "Technology": 1,
-    "General": 662,
-    "Sports": 1,
-    "Opinion": 4
+    "World": 11
   },
   "rlsBlocking": false
 }

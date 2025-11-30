@@ -43,6 +43,11 @@ export const CATEGORY_IMAGES: Record<string, string[]> = {
         "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80", // Writing/Journal
         "https://images.unsplash.com/photo-1576670159805-381a9de1e243?w=800&q=80", // Debate/Discussion
         "https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=800&q=80"  // Megaphone/Voice
+    ],
+    "India": [
+        "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80", // Taj Mahal
+        "https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=800&q=80", // India Gate
+        "https://images.unsplash.com/photo-1517427677506-ade074eb1432?w=800&q=80"  // Street/Culture
     ]
 };
 

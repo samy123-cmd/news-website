@@ -6,7 +6,7 @@ import { HeroSkeleton } from "@/components/HeroSkeleton";
 import { NewsletterStrip } from "@/components/NewsletterStrip";
 import { TrendingBar } from "@/components/TrendingBar";
 import { NewsFeed } from "@/components/NewsFeed";
-import { AIAnalysisBlock } from "@/components/AIAnalysisBlock";
+
 import { NewsFeedSkeleton } from "@/components/NewsFeedSkeleton";
 import { getLatestNews } from "./actions";
 
@@ -96,7 +96,7 @@ export default async function Home({ searchParams }: HomeProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="container mx-auto px-4 pb-16">
+      <div className="container mx-auto px-4 pb-8">
         <div className="flex flex-col gap-12">
 
           {/* News Feed */}
@@ -122,14 +122,13 @@ export default async function Home({ searchParams }: HomeProps) {
             </Suspense>
           </section>
 
-          {/* AI Analysis Block (Interspersed) */}
-          {category === "All" && <AIAnalysisBlock />}
+
 
         </div>
 
         {/* Newsletter Strip (Only show on Home/All) - Moved to bottom */}
         {category === "All" && (
-          <div className="mt-16 mb-8">
+          <div className="mt-8 mb-4">
             <NewsletterStrip />
           </div>
         )}

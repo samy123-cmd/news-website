@@ -5,6 +5,7 @@ import { Clock, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import Image from "next/image";
+import { stripHtml } from "@/lib/utils/text";
 
 interface Article {
     id: string;
@@ -59,7 +60,7 @@ export function FeaturedArticle({ article }: { article: Article }) {
                         <div className="flex items-center space-x-3 text-sm font-medium text-white/90 uppercase tracking-widest">
                             <span className="text-accent">{article.source}</span>
                             <span className="text-white/40">•</span>
-                            <span>{new Date(article.published_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                            <span>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                     </div>
 
@@ -70,7 +71,7 @@ export function FeaturedArticle({ article }: { article: Article }) {
 
                     {/* Summary */}
                     <p className="text-slate-300 leading-relaxed text-lg md:text-xl line-clamp-3 md:line-clamp-2 max-w-3xl font-serif">
-                        {article.summary}
+                        {stripHtml(article.summary)}
                     </p>
 
                     {/* CTA */}
