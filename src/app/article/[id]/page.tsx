@@ -73,18 +73,18 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
+    const { id } = await params;
+
+    // Validate ID to prevent database errors
+    if (!id || id === 'undefined' || id === 'null') {
+        notFound();
+    }
+
+    const supabase = await createClient();
+    let article;
+
     try {
-        const { id } = await params;
-
-        // Validate ID to prevent database errors
-        if (!id || id === 'undefined' || id === 'null') {
-            console.warn("Invalid article ID:", id);
-            notFound();
-        }
-
-        const supabase = await createClient();
-
-        const { data: article, error } = await supabase
+        const { data, error } = await supabase
             .from('articles')
             .select('*')
             .eq('id', id)
@@ -92,148 +92,148 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         if (error) {
             console.error("Supabase error fetching article:", error);
-            // If it's a format error (invalid UUID), 404 it. Otherwise it might be a 500.
             if (error.code === '22P02') { // invalid input syntax for type uuid
                 notFound();
             }
-            // For other errors, we might want to throw to trigger error.tsx, or 404.
-            // But let's 404 for now to be safe, unless it's a connection error.
-            notFound();
+            // For other errors, log and let it fall through to 404 or error boundary
+            // throw error; // Uncommenting this would trigger error.tsx
         }
 
-        if (!article) {
-            notFound();
-        }
-
-        // Generate a deterministic gradient based on the category
-        const getCategoryGradient = (category: string) => {
-            const gradients: Record<string, string> = {
-                World: "from-blue-900 via-slate-900 to-black",
-                Business: "from-emerald-900 via-slate-900 to-black",
-                Technology: "from-indigo-900 via-slate-900 to-black",
-                Entertainment: "from-purple-900 via-slate-900 to-black",
-                Sports: "from-orange-900 via-slate-900 to-black",
-                Science: "from-cyan-900 via-slate-900 to-black",
-                Health: "from-rose-900 via-slate-900 to-black",
-            };
-            return gradients[category] || "from-slate-900 via-gray-900 to-black";
-        };
-
-        return (
-            <main className="min-h-screen bg-background pb-20">
-                <ArticleJsonLd article={article} />
-                {/* Navigation Bar */}
-                <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0b1624]/80 backdrop-blur-md transition-all duration-300">
-                    <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                        <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-                            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                            <span className="font-bold text-sm">Back to Feed</span>
-                        </Link>
-                        <ArticleActions article={article} />
-                    </div>
-                </nav>
-
-                {/* Hero Section (Full Width) */}
-                <div className={cn(
-                    "relative w-full min-h-[70vh] flex items-end pb-16 pt-32",
-                    !article.image_url && `bg-gradient-to-b ${getCategoryGradient(article.category || 'General')}`
-                )}>
-                    {article.image_url && (
-                        <>
-                            <Image
-                                src={article.image_url}
-                                alt={article.title}
-                                fill
-                                className="object-cover"
-                                priority
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-[#0b1624]/60 to-transparent" />
-                        </>
-                    )}
-
-                    <div className="container mx-auto px-4 relative z-10">
-                        <div className="max-w-4xl">
-                            <div className="flex flex-wrap gap-3 mb-6">
-                                <span className="px-4 py-1.5 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(30,167,255,0.4)]">
-                                    {article.category}
-                                </span>
-                                {article.subcategory && (
-                                    <span className="px-4 py-1.5 rounded-full bg-white/10 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-white/10">
-                                        {article.subcategory}
-                                    </span>
-                                )}
-                            </div>
-
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight text-white mb-8 drop-shadow-lg">
-                                {article.title}
-                            </h1>
-
-                            <div className="flex items-center gap-6 text-sm text-gray-300 border-t border-white/10 pt-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white border border-white/20">
-                                        {(article.source || "GN").substring(0, 2).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-white">{article.source || "Global News"}</p>
-                                        <p className="text-xs text-gray-400">Verified Source</p>
-                                    </div>
-                                </div>
-                                <div className="h-8 w-px bg-white/10" />
-                                <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-primary" />
-                                    <span>
-                                        {article.published_at
-                                            ? formatDistanceToNow(new Date(article.published_at), { addSuffix: true })
-                                            : "Recently"}
-                                    </span>
-                                </div>
-                                {article.url && (
-                                    <>
-                                        <div className="h-8 w-px bg-white/10" />
-                                        <a
-                                            href={article.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-2 hover:text-primary transition-colors font-medium"
-                                        >
-                                            <span>Read Original</span>
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="container mx-auto px-4 py-12">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                        {/* Main Content Column */}
-                        <Suspense fallback={
-                            <div className="lg:col-span-8 flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                                <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                                <p className="text-muted-foreground font-medium animate-pulse">AI is polishing this article for you...</p>
-                            </div>
-                        }>
-                            <ArticleContent article={article} />
-                        </Suspense>
-
-                        {/* Sidebar Column */}
-                        <div className="lg:col-span-4 space-y-8">
-                            <div className="sticky top-24">
-                                <Suspense fallback={<SidebarSkeleton />}>
-                                    <ArticleSidebar currentArticleId={id} category={article.category || 'General'} />
-                                </Suspense>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <ViewTracker articleId={id} />
-            </main>
-        );
+        article = data;
     } catch (error) {
-        console.error("Error in ArticlePage:", error);
+        console.error("Unexpected error in ArticlePage data fetch:", error);
+        // Don't swallow notFound() if it was thrown above (though we didn't call it in try block yet)
+    }
+
+    if (!article) {
         notFound();
     }
+
+    // Generate a deterministic gradient based on the category
+    const getCategoryGradient = (category: string) => {
+        const gradients: Record<string, string> = {
+            World: "from-blue-900 via-slate-900 to-black",
+            Business: "from-emerald-900 via-slate-900 to-black",
+            Technology: "from-indigo-900 via-slate-900 to-black",
+            Entertainment: "from-purple-900 via-slate-900 to-black",
+            Sports: "from-orange-900 via-slate-900 to-black",
+            Science: "from-cyan-900 via-slate-900 to-black",
+            Health: "from-rose-900 via-slate-900 to-black",
+        };
+        return gradients[category] || "from-slate-900 via-gray-900 to-black";
+    };
+
+    return (
+        <main className="min-h-screen bg-background pb-20">
+            <ArticleJsonLd article={article} />
+            {/* Navigation Bar */}
+            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0b1624]/80 backdrop-blur-md transition-all duration-300">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
+                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                        <span className="font-bold text-sm">Back to Feed</span>
+                    </Link>
+                    <ArticleActions article={article} />
+                </div>
+            </nav>
+
+            {/* Hero Section (Full Width) */}
+            <div className={cn(
+                "relative w-full min-h-[70vh] flex items-end pb-16 pt-32",
+                !article.image_url && `bg-gradient-to-b ${getCategoryGradient(article.category || 'General')}`
+            )}>
+                {article.image_url && (
+                    <>
+                        <Image
+                            src={article.image_url}
+                            alt={article.title}
+                            fill
+                            className="object-cover"
+                            priority
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-[#0b1624]/60 to-transparent" />
+                    </>
+                )}
+
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl">
+                        <div className="flex flex-wrap gap-3 mb-6">
+                            <span className="px-4 py-1.5 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(30,167,255,0.4)]">
+                                {article.category}
+                            </span>
+                            {article.subcategory && (
+                                <span className="px-4 py-1.5 rounded-full bg-white/10 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-white/10">
+                                    {article.subcategory}
+                                </span>
+                            )}
+                        </div>
+
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight text-white mb-8 drop-shadow-lg">
+                            {article.title}
+                        </h1>
+
+                        <div className="flex items-center gap-6 text-sm text-gray-300 border-t border-white/10 pt-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white border border-white/20">
+                                    {(article.source || "GN").substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="font-bold text-white">{article.source || "Global News"}</p>
+                                    <p className="text-xs text-gray-400">Verified Source</p>
+                                </div>
+                            </div>
+                            <div className="h-8 w-px bg-white/10" />
+                            <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-primary" />
+                                <span>
+                                    {article.published_at
+                                        ? formatDistanceToNow(new Date(article.published_at), { addSuffix: true })
+                                        : "Recently"}
+                                </span>
+                            </div>
+                            {article.url && (
+                                <>
+                                    <div className="h-8 w-px bg-white/10" />
+                                    <a
+                                        href={article.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 hover:text-primary transition-colors font-medium"
+                                    >
+                                        <span>Read Original</span>
+                                        <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-4 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Main Content Column */}
+                    <Suspense fallback={
+                        <div className="lg:col-span-8 flex flex-col items-center justify-center min-h-[400px] space-y-4">
+                            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                            <p className="text-muted-foreground font-medium animate-pulse">AI is polishing this article for you...</p>
+                        </div>
+                    }>
+                        <ArticleContent article={article} />
+                    </Suspense>
+
+                    {/* Sidebar Column */}
+                    <div className="lg:col-span-4 space-y-8">
+                        <div className="sticky top-24">
+                            <Suspense fallback={<SidebarSkeleton />}>
+                                <ArticleSidebar currentArticleId={id} category={article.category || 'General'} />
+                            </Suspense>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ViewTracker articleId={id} />
+        </main>
+    );
 }
