@@ -80,10 +80,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         notFound();
     }
 
-    const supabase = await createClient();
     let article;
 
     try {
+        const supabase = await createClient();
+
         const { data, error } = await supabase
             .from('articles')
             .select('*')
