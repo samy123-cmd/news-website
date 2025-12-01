@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import Parser from 'rss-parser';
 import { polishContent } from '@/lib/ai/polisher';
+import { scrapeArticleContent } from '@/lib/ingest';
 import { getImageForCategory, CATEGORY_IMAGES } from '@/lib/constants';
 
 // Use Service Role Key for ingestion to bypass RLS and ensure writes
@@ -25,6 +26,10 @@ const FEEDS = [
     // World
     { url: 'http://feeds.bbci.co.uk/news/world/rss.xml', category: 'World' },
     { url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'World' },
+    // India
+    { url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms', category: 'India' },
+    { url: 'https://www.ndtv.com/rss/top-stories', category: 'India' },
+    { url: 'https://www.thehindu.com/news/national/feeder/default.rss', category: 'India' },
     // Business
     { url: 'http://feeds.bbci.co.uk/news/business/rss.xml', category: 'Business' },
     { url: 'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', category: 'Business' },
@@ -57,28 +62,59 @@ function getRelatedImages(category: string, mainImage: string): string[] {
     return related;
 }
 
-export async function ingestNews() {
-    console.log("Starting ingestion via API...");
+export async function ingestNews(limit?: number, category?: string) {
+    console.log(`Starting ingestion via API... Limit: ${limit}, Category: ${category || 'All'}`);
     const results: string[] = [];
 
     // Shuffle feeds
     const shuffledFeeds = [...FEEDS].sort(() => Math.random() - 0.5);
 
-    // Limit to 5 feeds per run to avoid timeouts in serverless functions (Vercel limit is 10s-60s)
-    const selectedFeeds = shuffledFeeds.slice(0, 5);
+    // Filter by category if provided
+    let candidateFeeds = shuffledFeeds;
+    if (category) {
+        candidateFeeds = shuffledFeeds.filter(f => f.category.toLowerCase() === category.toLowerCase());
+        if (candidateFeeds.length === 0) {
+            console.warn(`No feeds found for category: ${category}`);
+            return [];
+        }
+    }
+
+    // If limit is provided, use it; otherwise default to 5 feeds (for cron)
+    // If limit is -1, process ALL candidate feeds
+    const selectedFeeds = limit === -1 ? candidateFeeds : candidateFeeds.slice(0, limit || 5);
 
     for (const feedConfig of selectedFeeds) {
         try {
             console.log(`Fetching ${feedConfig.url}...`);
             const feed = await parser.parseURL(feedConfig.url);
-            const itemsToProcess = feed.items.slice(0, 2); // Process 2 items per feed
+            // If full run (-1), process more items (e.g., 3), otherwise 2
+            const itemsToProcess = feed.items.slice(0, limit === -1 ? 3 : 2);
 
             for (const item of itemsToProcess) {
                 if (!item.link || !item.title) continue;
 
                 let polished;
                 try {
-                    polished = await polishContent(item.contentSnippet || item.content || "", item.title);
+                    // Scrape full content if possible
+                    let fullContent = item.content || "";
+                    if (!fullContent || fullContent.length < 500) {
+                        console.log(`Scraping full content for: ${item.title}`);
+                        const scraped = await scrapeArticleContent(item.link);
+                        if (scraped.length > fullContent.length) {
+                            fullContent = scraped;
+                        }
+                    }
+
+                    // Fallback to snippet if scraping failed
+                    const textToPolish = fullContent || item.contentSnippet || "";
+
+                    polished = await polishContent(textToPolish, item.title);
+                    // Preserve the full scraped content if AI returns short summary
+                    if (polished.content.length < fullContent.length) {
+                        // If AI just summarized it, we might want to keep the original full text 
+                        // but usually polishContent returns a rewritten article.
+                        // Let's trust polishContent but ensure we passed enough data.
+                    }
                 } catch (e) {
                     console.error("AI Polish Error:", e);
                     polished = {

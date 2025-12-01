@@ -52,143 +52,141 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
     return (
-        <TooltipProvider delayDuration={100}>
-            <footer className="bg-[#08101a] border-t border-white/5 pt-20 pb-10 mt-24 relative overflow-hidden">
-                {/* Background Glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent blur-sm" />
+        <footer className="bg-[#08101a] border-t border-white/5 pt-20 pb-10 mt-24 relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent blur-sm" />
 
-                <div className="container mx-auto px-4 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
-                        {/* Brand & App */}
-                        {/* Brand & App */}
-                        <div className="lg:col-span-2 space-y-8 pr-8">
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
-                                        AI
-                                    </div>
-                                    <span className="font-heading font-bold text-2xl tracking-tight text-foreground">
-                                        Global News
-                                    </span>
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+                    {/* Brand & App */}
+                    {/* Brand & App */}
+                    <div className="lg:col-span-2 space-y-8 pr-8">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
+                                    AI
                                 </div>
-                                <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
-                                    The world&apos;s first AI-powered premium news aggregator. Delivering real-time, unbiased, and polished journalism from across the globe.
-                                </p>
+                                <span className="font-heading font-bold text-2xl tracking-tight text-foreground">
+                                    Global News
+                                </span>
                             </div>
-                            <div className="space-y-4">
-                                <h5 className="text-sm font-bold text-foreground">Get the App</h5>
-                                <div className="flex gap-3">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Link href="/apps" className="h-12 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-md text-left flex items-center gap-3 transition-all hover:scale-105">
-                                                <Smartphone className="w-6 h-6 text-primary" />
-                                                <div className="flex flex-col items-start leading-none">
-                                                    <span className="text-[10px] text-muted-foreground">Download on the</span>
-                                                    <span className="text-sm font-bold">App Store</span>
-                                                </div>
-                                            </Link>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom">
-                                            <p>Download for iOS devices</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                            <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
+                                The world&apos;s first AI-powered premium news aggregator. Delivering real-time, unbiased, and polished journalism from across the globe.
+                            </p>
+                        </div>
+                        <div className="space-y-4">
+                            <h5 className="text-sm font-bold text-foreground">Get the App</h5>
+                            <div className="flex gap-3">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link href="/apps" className="h-12 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-md text-left flex items-center gap-3 transition-all hover:scale-105">
+                                            <Smartphone className="w-6 h-6 text-primary" />
+                                            <div className="flex flex-col items-start leading-none">
+                                                <span className="text-[10px] text-muted-foreground">Download on the</span>
+                                                <span className="text-sm font-bold">App Store</span>
+                                            </div>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p>Download for iOS devices</p>
+                                    </TooltipContent>
+                                </Tooltip>
 
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Link href="/apps" className="h-12 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-md text-left flex items-center gap-3 transition-all hover:scale-105">
-                                                <Download className="w-6 h-6 text-primary" />
-                                                <div className="flex flex-col items-start leading-none">
-                                                    <span className="text-[10px] text-muted-foreground">Get it on</span>
-                                                    <span className="text-sm font-bold">Google Play</span>
-                                                </div>
-                                            </Link>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom">
-                                            <p>Download for Android devices</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </div>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link href="/apps" className="h-12 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-md text-left flex items-center gap-3 transition-all hover:scale-105">
+                                            <Download className="w-6 h-6 text-primary" />
+                                            <div className="flex flex-col items-start leading-none">
+                                                <span className="text-[10px] text-muted-foreground">Get it on</span>
+                                                <span className="text-sm font-bold">Google Play</span>
+                                            </div>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p>Download for Android devices</p>
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Links Column 1: Editions */}
-                        <div>
-                            <h4 className="font-bold text-foreground mb-6">Editions</h4>
-                            <ul className="space-y-3 text-sm text-muted-foreground">
-                                {EDITIONS.map((item) => (
-                                    <li key={item.label}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
-                                                    <Globe className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
-                                                    {item.label}
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
-                                                <p>{item.description}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                    {/* Links Column 1: Editions */}
+                    <div>
+                        <h4 className="font-bold text-foreground mb-6">Editions</h4>
+                        <ul className="space-y-3 text-sm text-muted-foreground">
+                            {EDITIONS.map((item) => (
+                                <li key={item.label}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
+                                                <Globe className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                {item.label}
+                                            </Link>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
+                                            <p>{item.description}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
-                        {/* Links Column 2: Company */}
-                        <div>
-                            <h4 className="font-bold text-foreground mb-6">Company</h4>
-                            <ul className="space-y-3 text-sm text-muted-foreground">
-                                {COMPANY_LINKS.map((item) => (
-                                    <li key={item.label}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
-                                                    <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-primary transition-colors" />
-                                                    {item.label}
-                                                </Link>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
-                                                <p>{item.description}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                    {/* Links Column 2: Company */}
+                    <div>
+                        <h4 className="font-bold text-foreground mb-6">Company</h4>
+                        <ul className="space-y-3 text-sm text-muted-foreground">
+                            {COMPANY_LINKS.map((item) => (
+                                <li key={item.label}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Link href={item.href} className="group flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1">
+                                                <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-primary transition-colors" />
+                                                {item.label}
+                                            </Link>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className="bg-[#0b1624] border-white/10">
+                                            <p>{item.description}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
+            </div>
 
-                {/* Bottom Bar */}
-                <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex flex-col md:flex-row items-center gap-4 text-xs text-muted-foreground">
-                        <p>&copy; {new Date().getFullYear()} AI Global News. All rights reserved. Aggregated from verified sources for educational purposes.</p>
-                        <span className="hidden md:inline text-white/10">|</span>
-                        <div className="flex gap-4">
-                            <Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy</Link>
-                            <Link href="/terms-of-service" className="hover:text-foreground transition-colors">Terms</Link>
-                            <Link href="/sitemap" className="hover:text-foreground transition-colors">Sitemap</Link>
-                        </div>
-                    </div>
-
+            {/* Bottom Bar */}
+            <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex flex-col md:flex-row items-center gap-4 text-xs text-muted-foreground">
+                    <p>&copy; {new Date().getFullYear()} AI Global News. All rights reserved. Aggregated from verified sources for educational purposes.</p>
+                    <span className="hidden md:inline text-white/10">|</span>
                     <div className="flex gap-4">
-                        {SOCIAL_LINKS.map((social, i) => (
-                            <Tooltip key={i}>
-                                <TooltipTrigger asChild>
-                                    <a
-                                        href={social.href}
-                                        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20"
-                                        aria-label={social.label}
-                                    >
-                                        <social.icon className="w-4 h-4" />
-                                    </a>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">
-                                    <p>{social.description}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        ))}
+                        <Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy</Link>
+                        <Link href="/terms-of-service" className="hover:text-foreground transition-colors">Terms</Link>
+                        <Link href="/sitemap" className="hover:text-foreground transition-colors">Sitemap</Link>
                     </div>
                 </div>
-            </footer>
-        </TooltipProvider >
+
+                <div className="flex gap-4">
+                    {SOCIAL_LINKS.map((social, i) => (
+                        <Tooltip key={i}>
+                            <TooltipTrigger asChild>
+                                <a
+                                    href={social.href}
+                                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20"
+                                    aria-label={social.label}
+                                >
+                                    <social.icon className="w-4 h-4" />
+                                </a>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                                <p>{social.description}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    ))}
+                </div>
+            </div>
+        </footer>
     );
 }

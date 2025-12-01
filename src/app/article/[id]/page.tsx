@@ -75,6 +75,13 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 export default async function ArticlePage({ params }: ArticlePageProps) {
     try {
         const { id } = await params;
+
+        // Validate ID to prevent database errors
+        if (!id || id === 'undefined' || id === 'null') {
+            console.warn("Invalid article ID:", id);
+            notFound();
+        }
+
         const supabase = await createClient();
 
         const { data: article, error } = await supabase
@@ -83,7 +90,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             .eq('id', id)
             .single();
 
-        if (error || !article) {
+        if (error) {
+            console.error("Supabase error fetching article:", error);
+            // If it's a format error (invalid UUID), 404 it. Otherwise it might be a 500.
+            if (error.code === '22P02') { // invalid input syntax for type uuid
+                notFound();
+            }
+            // For other errors, we might want to throw to trigger error.tsx, or 404.
+            // But let's 404 for now to be safe, unless it's a connection error.
+            notFound();
+        }
+
+        if (!article) {
             notFound();
         }
 

@@ -13,7 +13,9 @@ export async function GET(request: Request) {
     }
 
     try {
-        const newsResults = await ingestNews();
+        const isFull = searchParams.get('full') === 'true';
+        const category = searchParams.get('category') || undefined;
+        const newsResults = await ingestNews(isFull ? -1 : undefined, category);
 
         return NextResponse.json({
             success: true,

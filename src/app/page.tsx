@@ -61,15 +61,15 @@ export default async function Home({ searchParams }: HomeProps) {
     if (userCategories.length > 0) {
       // Fetch news for selected categories
       // We'll fetch top 2 from each selected category to build a personalized feed
-      const promises = userCategories.map(cat => getLatestNews(cat.toLowerCase()));
+      const promises = userCategories.map(cat => getLatestNews(cat.toLowerCase(), 6));
       const results = await Promise.all(promises);
       initialArticles = results.flat().sort((a: any, b: any) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
     } else {
       // Default mix if no preferences
       const [politics, tech, sports] = await Promise.all([
-        getLatestNews('politics'),
-        getLatestNews('technology'),
-        getLatestNews('sports')
+        getLatestNews('politics', 6),
+        getLatestNews('technology', 6),
+        getLatestNews('sports', 6)
       ]);
       initialArticles = [...politics, ...tech, ...sports].sort((a: any, b: any) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
     }

@@ -1,7 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-
-
 interface PolishedContent {
     headline: string;
     summary: string;
@@ -58,7 +56,9 @@ export async function polishContent(text: string, originalHeadline: string): Pro
       5. **Subcategory**: Choose a specific, relevant subcategory (e.g., AI, Space, Cricket, Hollywood, Elections, Markets).
       6. **Analyze**: Determine sentiment (positive/neutral/negative) and estimate read time (e.g., "4 min").
 
-      Output JSON ONLY. Ensure all strings are properly escaped to be valid JSON.
+      Output JSON ONLY. Do NOT use markdown code blocks. 
+      IMPORTANT: Ensure all double quotes inside strings are properly escaped (e.g., \"text\"). 
+      Do not include any trailing commas.
       {
         "headline": "...",
         "summary": "...",
@@ -81,9 +81,38 @@ export async function polishContent(text: string, originalHeadline: string): Pro
         ]) as any;
 
         const response = await result.response;
-        const jsonString = response.text();
+        let jsonString = response.text();
 
-        return JSON.parse(jsonString);
+        // Robust JSON extraction: Find the first '{' and the last '}'
+        const firstOpen = jsonString.indexOf('{');
+        const lastClose = jsonString.lastIndexOf('}');
+
+        if (firstOpen !== -1 && lastClose !== -1) {
+            jsonString = jsonString.substring(firstOpen, lastClose + 1);
+        }
+
+        try {
+            return JSON.parse(jsonString);
+        } catch (initialError) {
+            console.warn("Initial JSON parse failed, attempting cleanup...", initialError);
+
+            // Attempt to fix common JSON issues
+            // 1. Remove markdown code blocks if they survived
+            jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "");
+
+            // 2. Escape unescaped double quotes within string values
+            // This is a complex regex, so we'll try a simpler approach first:
+            // Remove newlines that might break parsing
+            jsonString = jsonString.replace(/\n/g, "\\n").replace(/\r/g, "");
+
+            // 3. Try parsing again
+            try {
+                return JSON.parse(jsonString);
+            } catch (retryError) {
+                console.error("Failed to parse JSON after cleanup:", jsonString.substring(0, 200) + "...");
+                throw retryError;
+            }
+        }
     } catch (error) {
         console.error("Error polishing content:", error);
         return {

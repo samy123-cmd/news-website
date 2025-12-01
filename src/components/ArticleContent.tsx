@@ -1,9 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
-import { scrapeArticleContent } from '@/lib/ingest';
-import { polishContent } from '@/lib/ai/polisher';
 import DOMPurify from 'isomorphic-dompurify';
 import { Sparkles, ExternalLink, MessageSquare } from 'lucide-react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from "@/components/ui/Button";
 
@@ -14,37 +11,9 @@ interface ArticleContentProps {
 export async function ArticleContent({ article }: ArticleContentProps) {
     try {
         const supabase = await createClient();
-        let finalArticle = article;
-
-        // Check if content needs polishing (missing or too short)
-        if (!article.content || article.content.length < 200) {
-            // 1. Scrape full content
-            const rawText = await scrapeArticleContent(article.url);
-
-            if (rawText && rawText.length > 200) {
-                // 2. Polish with AI
-                const polished = await polishContent(rawText, article.title);
-
-                // 3. Update DB
-                const { error: updateError } = await supabase
-                    .from('articles')
-                    .update({
-                        content: polished.content,
-                        summary: polished.summary,
-                        category: polished.category,
-                        subcategory: polished.subcategory,
-                        // read_time: polished.readTime, // Column missing in DB
-                    })
-                    .eq('id', article.id);
-
-                if (!updateError) {
-                    finalArticle = { ...article, ...polished };
-                }
-            }
-        }
 
         // Format content: Convert newlines to paragraphs if it looks like plain text
-        let formattedContent = finalArticle.content || finalArticle.summary || "";
+        let formattedContent = article.content || article.summary || "";
 
         // If content doesn't have HTML tags, wrap paragraphs
         if (!formattedContent.includes('<p>') && !formattedContent.includes('<br>')) {
@@ -106,14 +75,14 @@ export async function ArticleContent({ article }: ArticleContentProps) {
                             </div>
                             <div className="space-y-2">
                                 <p className="font-bold text-white text-xs uppercase tracking-wider">Primary Source</p>
-                                {finalArticle.url ? (
+                                {article.url ? (
                                     <a
-                                        href={finalArticle.url}
+                                        href={article.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-2 text-primary hover:underline bg-primary/5 p-3 rounded-lg border border-primary/10 transition-colors hover:bg-primary/10"
                                     >
-                                        <span className="font-bold">{finalArticle.source}</span>
+                                        <span className="font-bold">{article.source}</span>
                                         <ExternalLink className="w-3 h-3 ml-auto" />
                                     </a>
                                 ) : (
@@ -133,14 +102,14 @@ export async function ArticleContent({ article }: ArticleContentProps) {
                 </div>
 
                 {/* Image Gallery */}
-                {finalArticle.images && finalArticle.images.length > 1 && (
+                {article.images && article.images.length > 1 && (
                     <div className="mt-16 pt-16 border-t border-white/10">
                         <h3 className="text-2xl font-heading font-bold mb-8 flex items-center gap-3">
                             <span className="w-8 h-1 bg-primary rounded-full" />
                             In Pictures
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {finalArticle.images.slice(1).map((img: string, idx: number) => (
+                            {article.images.slice(1).map((img: string, idx: number) => (
                                 <div key={idx} className="relative aspect-video rounded-xl overflow-hidden shadow-lg group">
                                     <Image
                                         src={img}

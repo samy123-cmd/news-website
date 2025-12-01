@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import JsonLd from "@/components/seo/JsonLd";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -107,17 +108,19 @@ export default function RootLayout({
           <LanguageProvider>
             <BookmarkProvider>
               <ToastProvider>
-                <div className="flex flex-col min-h-screen">
-                  <TopBar />
-                  <Suspense fallback={<div className="h-20 bg-background/80 backdrop-blur-md border-b border-white/10" />}>
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    {children}
-                    <Analytics />
-                  </main>
-                  <Footer />
-                </div>
+                <TooltipProvider delayDuration={0}>
+                  <div className="flex flex-col min-h-screen">
+                    <TopBar />
+                    <Suspense fallback={<div className="h-20 bg-background/80 backdrop-blur-md border-b border-white/10" />}>
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      {children}
+                      <Analytics />
+                    </main>
+                    <Footer />
+                  </div>
+                </TooltipProvider>
               </ToastProvider>
             </BookmarkProvider>
           </LanguageProvider>

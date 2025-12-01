@@ -119,7 +119,7 @@ export async function NewsFeed({ category, subcategory, limit = 20, initialArtic
                 ))}
             </div>
 
-            <LoadMore initialOffset={limit} category={category} subcategory={subcategory} />
+            <LoadMore initialOffset={articles.length} category={category} subcategory={subcategory} />
         </div>
     );
 }

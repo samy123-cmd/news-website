@@ -15,7 +15,7 @@ const UUID_NAMESPACE = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'; // URL namespace
 async function getOgImage(link: string): Promise<string | null> {
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s timeout for OG image
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for OG image
 
         const response = await fetch(link, {
             headers: {
@@ -46,7 +46,7 @@ async function getOgImage(link: string): Promise<string | null> {
 export async function scrapeArticleContent(url: string): Promise<string> {
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
         const response = await fetch(url, {
             headers: {

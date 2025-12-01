@@ -30,7 +30,7 @@ export async function subscribeToNewsletter(formData: FormData) {
     return { success: "Thank you for subscribing!" };
 }
 
-export async function getLatestNews(category: string) {
+export async function getLatestNews(category: string, limit: number = 20) {
     const supabase = await createClient();
 
     // 1. Try to fetch fresh news from DB (e.g., last 30 minutes)
@@ -42,10 +42,12 @@ export async function getLatestNews(category: string) {
         .gt('published_at', thirtyMinutesAgo)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .limit(20);
+        .limit(limit);
 
     if (category !== 'All') {
-        query = query.eq('category', category);
+        // Normalize category to Title Case (e.g., "sports" -> "Sports")
+        const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+        query = query.eq('category', formattedCategory);
     }
 
     const { data: cachedNews, error } = await query;
