@@ -38,6 +38,8 @@ export async function polishContent(text: string, originalHeadline: string): Pro
       Input Headline: "${originalHeadline}"
       Input Text: "${text}"
 
+      IMPORTANT: If the Input Text is short (e.g., just a summary or snippet), you MUST expand upon it significantly using your general knowledge and context about the topic to create a full-length article. Do not just repeat the input.
+
       1. **Refine the Headline**: Create a compelling, click-worthy, yet credible headline. Avoid clickbait, but make it intriguing. Max 15 words.
       2. **Summarize**: Create a "Key Takeaways" style summary (bullet points preferred, max 150 words).
       3. **Write Article**: Write a detailed, engaging, and comprehensive news article (at least 400-600 words). 
