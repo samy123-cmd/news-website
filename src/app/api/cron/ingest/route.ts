@@ -12,7 +12,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PU
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60; // Allow 60 seconds for execution
+export const maxDuration = 55; // Leave 5s buffer before Vercel's 60s limit
 
 const FEEDS = [
     // World
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
 
     for (const url of shuffledFeeds) {
         // Break if we've processed enough for one run (to avoid timeout)
-        if (processedCount >= 50) break; // Increased to 50 to ensure coverage across all categories
+        if (processedCount >= 5) break; // Reduced to 5 to fit within Vercel's 60s timeout
 
         try {
             const feed = await parser.parseURL(url);

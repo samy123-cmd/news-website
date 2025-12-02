@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   /* config options here */
   reactCompiler: false,
+
+  experimental: {
+    serverComponentsExternalPackages: ['jsdom'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
