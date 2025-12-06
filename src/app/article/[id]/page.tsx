@@ -3,23 +3,21 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Clock, ExternalLink, MessageSquare, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, ExternalLink, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import DOMPurify from 'isomorphic-dompurify';
+import { Suspense } from 'react';
 import { ArticleSidebar } from '@/components/ArticleSidebar';
+import { SidebarSkeleton } from '@/components/SidebarSkeleton';
 import { cn } from '@/lib/utils';
 import ArticleJsonLd from '@/components/seo/ArticleJsonLd';
 import { ArticleContent } from '@/components/ArticleContent';
-import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
-import { SidebarSkeleton } from '@/components/SidebarSkeleton';
-import { ViewTracker } from '@/components/ViewTracker';
 import { ArticleActions } from '@/components/ArticleActions';
+import { ViewTracker } from '@/components/ViewTracker';
 
-// Force dynamic rendering for this page
-// Use ISR for better performance
-export const revalidate = 60;
-export const dynamicParams = true;
+// Revalidate article pages every 5 minutes for fresh content
+export const revalidate = 300;
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://global-ai-news.com';
 
 interface ArticlePageProps {
     params: Promise<{ id: string }>;
@@ -46,10 +44,14 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
         return {
             title: `${article.title} | Global AI News`,
             description: article.summary || `Read the latest news about ${article.category} on Global AI News.`,
+            keywords: [article.category, article.title.split(' ').slice(0, 5).join(', '), 'news', 'AI news', 'latest news'].filter(Boolean),
+            alternates: {
+                canonical: `${BASE_URL}/article/${id}`,
+            },
             openGraph: {
                 title: article.title,
                 description: article.summary || `Read the latest news about ${article.category} on Global AI News.`,
-                url: `https://global-ai-news.com/article/${id}`,
+                url: `${BASE_URL}/article/${id}`,
                 siteName: 'Global AI News',
                 images: article.image_url ? [{ url: article.image_url }] : [],
                 type: 'article',
@@ -96,14 +98,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             if (error.code === '22P02') { // invalid input syntax for type uuid
                 notFound();
             }
-            // For other errors, log and let it fall through to 404 or error boundary
-            // throw error; // Uncommenting this would trigger error.tsx
         }
 
         article = data;
     } catch (error) {
         console.error("Unexpected error in ArticlePage data fetch:", error);
-        // Don't swallow notFound() if it was thrown above (though we didn't call it in try block yet)
     }
 
     if (!article) {
@@ -151,6 +150,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                             fill
                             className="object-cover"
                             priority
+                            sizes="100vw"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0b1624] via-[#0b1624]/60 to-transparent" />
                     </>
@@ -173,7 +173,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                             {article.title}
                         </h1>
 
-                        <div className="flex items-center gap-6 text-sm text-gray-300 border-t border-white/10 pt-6">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 border-t border-white/10 pt-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white border border-white/20">
                                     {(article.source || "GN").substring(0, 2).toUpperCase()}
@@ -183,6 +183,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                                     <p className="text-xs text-gray-400">Verified Source</p>
                                 </div>
                             </div>
+                            {article.byline && (
+                                <>
+                                    <div className="h-8 w-px bg-white/10" />
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-gray-400">By</span>
+                                        <span className="font-semibold text-white">{article.byline}</span>
+                                    </div>
+                                </>
+                            )}
                             <div className="h-8 w-px bg-white/10" />
                             <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-primary" />

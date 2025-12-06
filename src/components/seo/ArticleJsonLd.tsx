@@ -1,4 +1,6 @@
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://global-ai-news.com";
+
 interface ArticleJsonLdProps {
     article: {
         id: string;
@@ -11,11 +13,13 @@ interface ArticleJsonLdProps {
         author?: string;
         source?: string;
         url?: string;
+        category?: string;
     };
 }
 
 export default function ArticleJsonLd({ article }: ArticleJsonLdProps) {
-    const jsonLd = {
+    // NewsArticle schema for rich snippets
+    const articleLd = {
         "@context": "https://schema.org",
         "@type": "NewsArticle",
         "headline": article.title,
@@ -33,19 +37,53 @@ export default function ArticleJsonLd({ article }: ArticleJsonLdProps) {
             "name": "Global AI News",
             "logo": {
                 "@type": "ImageObject",
-                "url": `${process.env.NEXT_PUBLIC_SITE_URL || "https://global-ai-news.com"}/logo.png`
+                "url": `${BASE_URL}/logo.png`
             }
         },
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://global-ai-news.com"}/article/${article.id}`
-        }
+            "@id": `${BASE_URL}/article/${article.id}`
+        },
+        "keywords": article.category ? `${article.category}, news, AI news, latest news` : "news, AI news",
+        "articleSection": article.category || "News",
+        "inLanguage": "en-US"
+    };
+
+    // BreadcrumbList schema for navigation rich results
+    const breadcrumbLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": BASE_URL
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": article.category || "News",
+                "item": `${BASE_URL}/?category=${article.category || 'All'}`
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": article.title
+            }
+        ]
     };
 
     return (
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+            />
+        </>
     );
 }

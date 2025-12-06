@@ -3,13 +3,16 @@ import { createClient } from '@/lib/supabase/server';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://global-ai-news.com';
 
+// Categories for sitemap
+const CATEGORIES = ['World', 'India', 'Business', 'Technology', 'Entertainment', 'Sports', 'Science', 'Opinion'];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient();
 
     // Fetch all articles
     const { data: articles } = await supabase
         .from('articles')
-        .select('id, published_at')
+        .select('id, published_at, category')
         .order('published_at', { ascending: false })
         .limit(1000);
 
@@ -18,6 +21,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(article.published_at),
         changeFrequency: 'daily' as const,
         priority: 0.7,
+    }));
+
+    // Category pages for SEO
+    const categoryUrls = CATEGORIES.map((cat) => ({
+        url: `${BASE_URL}/?category=${cat}`,
+        lastModified: new Date(),
+        changeFrequency: 'hourly' as const,
+        priority: 0.9,
     }));
 
     return [
@@ -99,6 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'monthly',
             priority: 0.5,
         },
+        ...categoryUrls,
         ...articleUrls,
     ];
 }

@@ -10,7 +10,7 @@ import { NewsFeed } from "@/components/NewsFeed";
 import { NewsFeedSkeleton } from "@/components/NewsFeedSkeleton";
 import { getLatestNews } from "./actions";
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 interface HomeProps {
   searchParams: Promise<{

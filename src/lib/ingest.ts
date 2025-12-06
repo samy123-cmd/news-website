@@ -115,12 +115,18 @@ async function normalizeArticle(item: any, category: string) {
         imageUrl = await getOgImage(item.link);
     }
 
+    // Store the full content snippet instead of truncating to 150 chars
+    const fullSnippet = item.contentSnippet || "";
+    const summary = fullSnippet.length > 1000
+        ? fullSnippet.substring(0, 1000) + "..."
+        : fullSnippet;
+
     return {
         id: uuidv5(item.link, UUID_NAMESPACE), // Generate deterministic UUID from URL
         title: item.title,
         url: item.link, // Mapped to 'url' for NewsCard
-        // "Polishing": Clean up descriptions
-        summary: item.contentSnippet?.substring(0, 150) + "...",
+        summary: summary,
+        content: item.content || fullSnippet, // Store full content if available
         published_at: new Date(item.pubDate || item.isoDate).toISOString(), // Mapped to 'published_at'
         image_url: imageUrl || '/placeholders/default-news.jpg', // Mapped to 'image_url'
         source: item.creator || new URL(item.link).hostname.replace('www.', ''),
@@ -128,6 +134,7 @@ async function normalizeArticle(item: any, category: string) {
         read_time: "3", // Default read time
     };
 }
+
 
 // 3. The Main Fetcher
 export async function fetchNewsByCategory(category: string) {
@@ -209,6 +216,7 @@ export async function fetchNewsByCategory(category: string) {
                     title: a.title,
                     url: a.url,
                     summary: a.summary,
+                    content: a.content, // Store full content
                     published_at: a.published_at,
                     image_url: a.image_url,
                     source: a.source,
