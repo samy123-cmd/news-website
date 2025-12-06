@@ -1,5 +1,6 @@
 import { STATIC_CONTENT } from "@/lib/content";
 import { notFound } from "next/navigation";
+import sanitizeHtml from "sanitize-html";
 
 interface ContentPageProps {
     params: Promise<{
@@ -42,6 +43,15 @@ export default async function ContentPage({ params }: ContentPageProps) {
         notFound();
     }
 
+    // Sanitize content for defense-in-depth XSS protection
+    const sanitizedContent = sanitizeHtml(data.content, {
+        allowedTags: ['h1', 'h2', 'h3', 'h4', 'p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre'],
+        allowedAttributes: {
+            'a': ['href', 'target', 'rel'],
+        },
+        allowedSchemes: ['http', 'https', 'mailto'],
+    });
+
     return (
         <div className="min-h-screen bg-background pt-24 pb-16 px-4">
             <div className="container mx-auto max-w-4xl">
@@ -54,10 +64,11 @@ export default async function ContentPage({ params }: ContentPageProps) {
 
                     <div
                         className="prose prose-invert prose-lg max-w-none prose-headings:font-heading prose-a:text-primary hover:prose-a:text-primary/80"
-                        dangerouslySetInnerHTML={{ __html: data.content }}
+                        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                     />
                 </div>
             </div>
         </div>
     );
 }
+
