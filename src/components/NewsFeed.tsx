@@ -1,6 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { NewsCard } from "./NewsCard";
+import { NewsCardFeatured, NewsCardCompact } from "./NewsCardVariants";
 import { Sparkles } from "lucide-react";
 import { AdUnit } from "@/components/AdUnit";
 import { LoadMore } from "@/components/LoadMore";
@@ -9,7 +10,7 @@ interface NewsFeedProps {
     category?: string;
     subcategory?: string;
     limit?: number;
-    initialArticles?: any[]; // Allow passing articles directly
+    initialArticles?: any[];
 }
 
 export async function NewsFeed({ category, subcategory, limit = 20, initialArticles }: NewsFeedProps) {
@@ -44,7 +45,6 @@ export async function NewsFeed({ category, subcategory, limit = 20, initialArtic
     if (rawArticles) {
         const uniqueArticles: typeof rawArticles = [];
 
-        // Simple Levenshtein distance for similarity
         const getSimilarity = (s1: string, s2: string) => {
             const longer = s1.length > s2.length ? s1 : s2;
             const shorter = s1.length > s2.length ? s2 : s1;
@@ -74,7 +74,6 @@ export async function NewsFeed({ category, subcategory, limit = 20, initialArtic
         for (const article of rawArticles) {
             let isDuplicate = false;
             for (const seen of uniqueArticles) {
-                // Check if titles are > 60% similar
                 if (getSimilarity(article.title.toLowerCase(), seen.title.toLowerCase()) > 0.6) {
                     isDuplicate = true;
                     break;
@@ -104,22 +103,54 @@ export async function NewsFeed({ category, subcategory, limit = 20, initialArtic
         );
     }
 
+    // Split articles into sections for Edge-style layout
+    const featuredArticles = articles.slice(0, 2);  // First 2 for hero
+    const gridArticles = articles.slice(2, 8);      // Next 6 for grid
+    const compactArticles = articles.slice(8);       // Rest for compact list
+
     return (
-        <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {articles.map((article, index) => (
-                    <React.Fragment key={article.id}>
-                        <NewsCard article={article} index={index} />
-                        {(index + 1) % 6 === 0 && (
-                            <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-center">
-                                <AdUnit slotId={`feed-${index}`} label="Sponsored" />
-                            </div>
-                        )}
-                    </React.Fragment>
-                ))}
-            </div>
+        <div className="space-y-8">
+            {/* Featured Section - Large Hero Tiles */}
+            {featuredArticles.length > 0 && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {featuredArticles.map((article) => (
+                        <NewsCardFeatured key={article.id} article={article} />
+                    ))}
+                </div>
+            )}
+
+            {/* Standard Grid Section */}
+            {gridArticles.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {gridArticles.map((article, index) => (
+                        <React.Fragment key={article.id}>
+                            <NewsCard article={article} index={index} />
+                            {(index + 1) % 6 === 0 && (
+                                <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-center">
+                                    <AdUnit slotId={`feed-${index}`} label="Sponsored" />
+                                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </div>
+            )}
+
+            {/* Compact List Section */}
+            {compactArticles.length > 0 && (
+                <div className="space-y-3">
+                    <h3 className="text-lg font-heading font-bold text-muted-foreground uppercase tracking-wider mb-4">
+                        More Stories
+                    </h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        {compactArticles.map((article, index) => (
+                            <NewsCardCompact key={article.id} article={article} index={index} />
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <LoadMore initialOffset={articles.length} category={category} subcategory={subcategory} />
         </div>
     );
 }
+
