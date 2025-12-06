@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { v5 as uuidv5 } from 'uuid';
 
+const isDev = process.env.NODE_ENV === 'development';
 const parser = new Parser();
 const UUID_NAMESPACE = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'; // URL namespace
 
@@ -155,7 +156,7 @@ export async function fetchNewsByCategory(category: string) {
     }
 
     const urls = feeds.map(f => f.url);
-    console.log(`[Refinery] Fetching ${category} from ${urls.length} sources...`);
+    if (isDev) console.log(`[Refinery] Fetching ${category} from ${urls.length} sources...`);
 
     const promises = urls.map(async (url) => {
         try {

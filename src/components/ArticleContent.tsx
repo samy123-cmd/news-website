@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Button } from "@/components/ui/Button";
 import { polishArticleAction } from '@/app/actions/polish';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 interface ArticleContentProps {
     article: any;
 }
@@ -20,7 +22,7 @@ export async function ArticleContent({ article }: ArticleContentProps) {
 
         // If content is too short (less than 500 chars), try to expand it
         if (totalContentLength < 500 && article.url && article.title) {
-            console.log(`[ArticleContent] Content too short (${totalContentLength} chars), triggering AI polish for ${article.id}`);
+            if (isDev) console.log(`[ArticleContent] Content too short (${totalContentLength} chars), triggering AI polish for ${article.id}`);
 
             try {
                 const polishResult = await polishArticleAction(article.id, article.url, article.title);
@@ -36,7 +38,7 @@ export async function ArticleContent({ article }: ArticleContentProps) {
                     if (refreshedArticle) {
                         article.content = refreshedArticle.content;
                         article.summary = refreshedArticle.summary;
-                        console.log(`[ArticleContent] Successfully expanded content to ${refreshedArticle.content?.length || 0} chars`);
+                        if (isDev) console.log(`[ArticleContent] Successfully expanded content to ${refreshedArticle.content?.length || 0} chars`);
                     }
                 }
             } catch (polishError) {

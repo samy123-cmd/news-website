@@ -12,6 +12,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PU
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'; // Explicit: jsdom requires Node.js runtime
 export const maxDuration = 55; // Leave 5s buffer before Vercel's 60s limit
 
 const FEEDS = [
@@ -108,7 +109,8 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log("Starting automated ingestion...");
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) console.log("Starting automated ingestion...");
     const parser = new Parser({
         customFields: {
             item: [

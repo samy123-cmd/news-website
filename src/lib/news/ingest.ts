@@ -4,6 +4,8 @@ import { polishContent } from '@/lib/ai/polisher';
 import { scrapeArticleContent } from '@/lib/ingest';
 import { getImageForCategory, CATEGORY_IMAGES } from '@/lib/constants';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 // Use lazy initialization for Supabase to allow env vars to be loaded first
 let supabase: SupabaseClient | null = null;
 
@@ -69,7 +71,7 @@ function getRelatedImages(category: string, mainImage: string): string[] {
 }
 
 export async function ingestNews(limit?: number, category?: string) {
-    console.log(`Starting ingestion via API... Limit: ${limit}, Category: ${category || 'All'}`);
+    if (isDev) console.log(`Starting ingestion via API... Limit: ${limit}, Category: ${category || 'All'}`);
     const results: string[] = [];
 
     // Shuffle feeds
@@ -91,7 +93,7 @@ export async function ingestNews(limit?: number, category?: string) {
 
     for (const feedConfig of selectedFeeds) {
         try {
-            console.log(`Fetching ${feedConfig.url}...`);
+            if (isDev) console.log(`Fetching ${feedConfig.url}...`);
             const feed = await parser.parseURL(feedConfig.url);
             // If full run (-1), process more items (e.g., 3), otherwise 2
             const itemsToProcess = feed.items.slice(0, limit === -1 ? 3 : 2);
@@ -104,7 +106,7 @@ export async function ingestNews(limit?: number, category?: string) {
                     // Scrape full content if possible
                     let fullContent = item.content || "";
                     if (!fullContent || fullContent.length < 500) {
-                        console.log(`Scraping full content for: ${item.title}`);
+                        if (isDev) console.log(`Scraping full content for: ${item.title}`);
                         const scraped = await scrapeArticleContent(item.link);
                         if (scraped.length > fullContent.length) {
                             fullContent = scraped;

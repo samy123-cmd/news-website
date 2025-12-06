@@ -4,16 +4,18 @@ import { createClient } from '@/lib/supabase/server';
 import { scrapeArticleContent } from '@/lib/ingest';
 import { polishContent } from '@/lib/ai/polisher';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export async function polishArticleAction(articleId: string, articleUrl: string, articleTitle: string) {
     try {
-        console.log(`[Polisher] Starting background polish for ${articleId}`);
+        if (isDev) console.log(`[Polisher] Starting polish for ${articleId}`);
         const supabase = await createClient();
 
         // 1. Scrape full content
         const rawText = await scrapeArticleContent(articleUrl);
 
         if (!rawText || rawText.length < 200) {
-            console.log(`[Polisher] Scraped content too short for ${articleId}`);
+            if (isDev) console.log(`[Polisher] Scraped content too short for ${articleId}`);
             return { success: false, message: "Could not scrape sufficient content" };
         }
 
@@ -36,7 +38,7 @@ export async function polishArticleAction(articleId: string, articleUrl: string,
             return { success: false, error: updateError.message };
         }
 
-        console.log(`[Polisher] Successfully polished ${articleId}`);
+        if (isDev) console.log(`[Polisher] Successfully polished ${articleId}`);
         // Note: revalidatePath cannot be called during render
         // The article page uses revalidate=300 which will naturally refresh
         return { success: true };
