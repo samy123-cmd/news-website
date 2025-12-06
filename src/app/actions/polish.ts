@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { scrapeArticleContent } from '@/lib/ingest';
 import { polishContent } from '@/lib/ai/polisher';
-import { revalidatePath } from 'next/cache';
 
 export async function polishArticleAction(articleId: string, articleUrl: string, articleTitle: string) {
     try {
@@ -29,7 +28,6 @@ export async function polishArticleAction(articleId: string, articleUrl: string,
                 summary: polished.summary,
                 category: polished.category,
                 subcategory: polished.subcategory,
-                // read_time: polished.readTime, // Column missing in DB
             })
             .eq('id', articleId);
 
@@ -39,7 +37,8 @@ export async function polishArticleAction(articleId: string, articleUrl: string,
         }
 
         console.log(`[Polisher] Successfully polished ${articleId}`);
-        revalidatePath(`/article/${articleId}`);
+        // Note: revalidatePath cannot be called during render
+        // The article page uses revalidate=300 which will naturally refresh
         return { success: true };
 
     } catch (error) {
@@ -47,3 +46,4 @@ export async function polishArticleAction(articleId: string, articleUrl: string,
         return { success: false, message: "Internal server error during polishing" };
     }
 }
+
