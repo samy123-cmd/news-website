@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Loader2 } from "lucide-react";
 import { loadMoreNews } from "@/app/actions/news";
-import { NewsCard } from "@/components/NewsCard";
+import { NewsCardCompact } from "@/components/NewsCardVariants";
 import { AdUnit } from "@/components/AdUnit";
 
 interface LoadMoreProps {
@@ -39,12 +39,12 @@ export function LoadMore({ initialOffset, category, subcategory }: LoadMoreProps
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-8">
                 {articles.map((article, index) => (
                     <div key={`${article.id}-${index}`} className="contents">
-                        <NewsCard article={article} index={index + offset} />
-                        {(index + offset + 1) % 6 === 0 && (
-                            <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-center my-8">
+                        <NewsCardCompact article={article} index={index + offset} />
+                        {(index + offset + 1) % 12 === 0 && (
+                            <div className="col-span-1 lg:col-span-2 flex justify-center my-8">
                                 <AdUnit slotId={`feed-more-${index + offset}`} label="Sponsored" />
                             </div>
                         )}
