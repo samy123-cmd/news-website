@@ -1,16 +1,22 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Parser from 'rss-parser';
 import { polishContent } from '@/lib/ai/polisher';
 import { scrapeArticleContent } from '@/lib/ingest';
 import { getImageForCategory, CATEGORY_IMAGES } from '@/lib/constants';
 
-// Use Service Role Key for ingestion to bypass RLS and ensure writes
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Use lazy initialization for Supabase to allow env vars to be loaded first
+let supabase: SupabaseClient | null = null;
 
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false }
-});
+function getSupabase() {
+    if (!supabase) {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+        supabase = createClient(supabaseUrl, serviceRoleKey, {
+            auth: { persistSession: false }
+        });
+    }
+    return supabase;
+}
 
 const parser = new Parser({
     customFields: {
@@ -149,7 +155,7 @@ export async function ingestNews(limit?: number, category?: string) {
 
                 const relatedImages = getRelatedImages(polished.category, imageUrl);
 
-                const { error } = await supabase.from('articles').upsert({
+                const { error } = await getSupabase().from('articles').upsert({
                     title: polished.headline,
                     url: item.link,
                     summary: polished.summary,
