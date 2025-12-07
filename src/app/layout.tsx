@@ -37,7 +37,7 @@ const notoSansDevanagari = Noto_Sans_Devanagari({
   display: "swap",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://global-ai-news.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ainews-olive.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

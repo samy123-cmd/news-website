@@ -17,7 +17,7 @@ import { ViewTracker } from '@/components/ViewTracker';
 // Revalidate article pages every 5 minutes for fresh content
 export const revalidate = 300;
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://global-ai-news.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
 interface ArticlePageProps {
     params: Promise<{ id: string }>;

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://global-ai-news.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
 // Categories for sitemap
 const CATEGORIES = ['World', 'India', 'Business', 'Technology', 'Entertainment', 'Sports', 'Science', 'Opinion'];

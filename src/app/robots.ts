@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://global-ai-news.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
 export default function robots(): MetadataRoute.Robots {
     return {
