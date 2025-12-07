@@ -21,20 +21,16 @@ export async function GET() {
 
     const items = articles?.map((article) => {
         const link = `${BASE_URL}/article/${article.id}`;
-
-        // Escape special XML characters
-        const safeTitle = (article.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const safeSummary = (article.summary || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const category = typeof article.category === 'string' ? article.category : 'General';
 
         return `
         <item>
-            <title>${safeTitle}</title>
+            <title><![CDATA[${article.title || ''}]]></title>
             <link>${link}</link>
             <guid>${link}</guid>
             <pubDate>${new Date(article.published_at).toUTCString()}</pubDate>
-            <description>${safeSummary}</description>
-            <category>${category}</category>
+            <description><![CDATA[${article.summary || ''}]]></description>
+            <category><![CDATA[${category}]]></category>
             ${article.image_url ? `<enclosure url="${article.image_url}" type="image/jpeg" />` : ''}
         </item>
         `;
