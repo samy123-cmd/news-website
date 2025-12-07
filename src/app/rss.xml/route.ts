@@ -31,7 +31,7 @@ export async function GET() {
             <pubDate>${new Date(article.published_at).toUTCString()}</pubDate>
             <description><![CDATA[${article.summary || ''}]]></description>
             <category><![CDATA[${category}]]></category>
-            ${article.image_url ? `<enclosure url="${article.image_url}" type="image/jpeg" />` : ''}
+            ${article.image_url ? `<enclosure url="${article.image_url.replace(/&/g, '&amp;')}" type="image/jpeg" />` : ''}
         </item>
         `;
     }).join('') || '';
