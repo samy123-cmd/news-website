@@ -1,6 +1,8 @@
+"use server";
+
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 export interface ScrapedArticle {
     content: string;
@@ -46,7 +48,28 @@ export async function scrapeArticle(url: string): Promise<ScrapedArticle | null>
 
         // Sanitize content
         const contentToSanitize = article.content || "";
-        const cleanContent = DOMPurify.sanitize(contentToSanitize);
+        const cleanContent = sanitizeHtml(contentToSanitize, {
+            allowedTags: [
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                'p', 'br', 'hr',
+                'strong', 'b', 'em', 'i', 'u', 's', 'del', 'ins', 'mark',
+                'a', 'img',
+                'ul', 'ol', 'li',
+                'blockquote', 'pre', 'code',
+                'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                'div', 'span',
+                'sub', 'sup'
+            ],
+            allowedAttributes: {
+                'a': ['href', 'target', 'rel'],
+                'img': ['src', 'alt', 'title', 'width', 'height'],
+                '*': ['class', 'id']
+            },
+            allowedSchemes: ['http', 'https', 'mailto'],
+            allowedSchemesByTag: {
+                'img': ['http', 'https', 'data']
+            }
+        });
 
         return {
             content: cleanContent,
