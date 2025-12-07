@@ -210,7 +210,7 @@ export async function GET(request: Request) {
                     image_url: imageUrl,
                     images: relatedImages,
                     status: 'published' // Auto-publish for now
-                });
+                } as any);
 
                 if (error) {
                     console.error("DB Error:", error);
