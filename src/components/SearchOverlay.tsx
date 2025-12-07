@@ -119,6 +119,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             {loading && <Loader2 className="w-5 h-5 text-primary animate-spin" />}
                             <button
                                 onClick={onClose}
+                                aria-label="Close search"
                                 className="p-1 hover:bg-white/10 rounded-full transition-colors"
                             >
                                 <X className="w-5 h-5 text-muted-foreground" />

@@ -12,24 +12,24 @@ export default function PrivacyPolicy() {
                     This Privacy Policy explains how your personal information is collected, used, and disclosed by Global AI News.
                 </p>
 
-                <h3>1. Information We Collect</h3>
+                <h2>1. Information We Collect</h2>
                 <p>
                     We collect information you provide directly to us, such as when you subscribe to our newsletter,
                     create an account, or contact us for support.
                 </p>
 
-                <h3>2. How We Use Your Information</h3>
+                <h2>2. How We Use Your Information</h2>
                 <p>
                     We use the information we collect to provide, maintain, and improve our services,
                     to develop new ones, and to protect Global AI News and our users.
                 </p>
 
-                <h3>3. Cookies and Tracking Technologies</h3>
+                <h2>3. Cookies and Tracking Technologies</h2>
                 <p>
                     We use cookies and similar tracking technologies to track the activity on our Service and hold certain information.
                 </p>
 
-                <h3>4. Third-Party Services</h3>
+                <h2>4. Third-Party Services</h2>
                 <p>
                     We may employ third-party companies and individuals due to the following reasons:
                     <ul>
@@ -40,7 +40,7 @@ export default function PrivacyPolicy() {
                     </ul>
                 </p>
 
-                <h3>5. Contact Us</h3>
+                <h2>5. Contact Us</h2>
                 <p>
                     If you have any questions about this Privacy Policy, please contact us at: privacy@global-ai-news.com
                 </p>

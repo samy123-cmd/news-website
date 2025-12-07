@@ -134,7 +134,7 @@ export async function GET(request: Request) {
 
     for (const url of shuffledFeeds) {
         // Break if we've processed enough for one run (to avoid timeout)
-        if (processedCount >= 5) break; // Reduced to 5 to fit within Vercel's 60s timeout
+        if (processedCount >= 3) break; // Limited to 3 for Gemini free tier rate limits
 
         try {
             const feed = await parser.parseURL(url);
@@ -168,6 +168,9 @@ export async function GET(request: Request) {
                 } catch (err) {
                     console.warn(`Failed to fetch full content for ${item.link}:`, err);
                 }
+
+                // Delay before AI call to avoid rate limits
+                await new Promise(r => setTimeout(r, 3000));
 
                 const polished = await polishContent(fullContent, item.title);
 

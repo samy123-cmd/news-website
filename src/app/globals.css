@@ -55,8 +55,8 @@
   --border: #334155;
   /* Slate 700 - Subtle borders */
   --muted: #334155;
-  --muted-foreground: #94A3B8;
-  /* Slate 400 - Readable muted text */
+  --muted-foreground: #A0AEC0;
+  /* Improved contrast - lighter slate for accessibility */
 
   --popover: #1E293B;
   --popover-foreground: #F8FAFC;

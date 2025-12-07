@@ -1,11 +1,11 @@
 import { polishContent } from './src/lib/ai/polisher';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 
 dotenv.config({ path: '.env.local' });
 
-async function run() {
+async function runAndSave() {
     console.log("Testing AI Polisher...");
-
     const sampleText = `
         SpaceX has successfully launched another batch of Starlink satellites into orbit. 
         The Falcon 9 rocket lifted off from Cape Canaveral on Tuesday morning. 
@@ -17,18 +17,12 @@ async function run() {
 
     try {
         const result = await polishContent(sampleText, sampleHeadline);
-        console.log("--- Polished Result ---");
-        console.log(JSON.stringify(result, null, 2));
-
-        if (result.category === 'Science' || result.category === 'Technology') {
-            console.log("SUCCESS: Category correctly identified.");
-        } else {
-            console.warn(`WARNING: Unexpected category: ${result.category}`);
-        }
-
+        console.log("Polished!");
+        fs.writeFileSync('polisher_result.json', JSON.stringify(result, null, 2));
+        console.log("Saved to polisher_result.json");
     } catch (e) {
-        console.error("Polisher Failed:", e);
+        console.error(e);
     }
 }
 
-run();
+runAndSave();
