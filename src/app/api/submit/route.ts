@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z, ZodError } from 'zod';
 import sanitizeHtml from 'sanitize-html';
+import { rateLimit, getClientIdentifier, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
 
 // Validation schema for article submissions
 const submitSchema = z.object({
@@ -21,6 +22,20 @@ const submitSchema = z.object({
 });
 
 export async function POST(request: Request) {
+    // Rate limiting check
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = rateLimit(clientId, 'submit', RATE_LIMITS.SUBMIT);
+
+    if (!rateLimitResult.allowed) {
+        return NextResponse.json(
+            { error: 'Too many requests. Please try again later.' },
+            {
+                status: 429,
+                headers: rateLimitHeaders(rateLimitResult)
+            }
+        );
+    }
+
     try {
         const body = await request.json();
 

@@ -1,12 +1,27 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { z, ZodError } from 'zod';
+import { rateLimit, getClientIdentifier, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
 
 const subscribeSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
 });
 
 export async function POST(request: Request) {
+    // Rate limiting check - stricter for newsletter to prevent email bombing
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = rateLimit(clientId, 'newsletter', RATE_LIMITS.NEWSLETTER);
+
+    if (!rateLimitResult.allowed) {
+        return NextResponse.json(
+            { error: 'Too many subscription attempts. Please try again later.' },
+            {
+                status: 429,
+                headers: rateLimitHeaders(rateLimitResult)
+            }
+        );
+    }
+
     try {
         const body = await request.json();
 
@@ -61,7 +76,7 @@ export async function POST(request: Request) {
     } catch (error) {
         if (error instanceof ZodError) {
             return NextResponse.json(
-                { error: (error as any).errors[0].message },
+                { error: error.issues[0].message },
                 { status: 400 }
             );
         }

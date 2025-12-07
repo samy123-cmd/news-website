@@ -194,11 +194,15 @@ export async function ArticleContent({ article }: ArticleContentProps) {
         );
     } catch (error) {
         console.error("Error in ArticleContent:", error);
-        // Fallback UI
+        // Fallback UI - still sanitize content to prevent XSS
+        const fallbackContent = sanitizeHtml(article.content || article.summary || "", {
+            allowedTags: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h2', 'h3', 'blockquote'],
+            allowedAttributes: {},
+        });
         return (
             <div className="lg:col-span-8">
                 <article className="prose prose-lg dark:prose-invert max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: article.content || article.summary || "" }} />
+                    <div dangerouslySetInnerHTML={{ __html: fallbackContent }} />
                 </article>
                 <p className="text-sm text-muted-foreground mt-4 italic">
                     Note: Some AI-enhanced features may be temporarily unavailable.

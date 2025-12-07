@@ -1,9 +1,24 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { rateLimit, getClientIdentifier, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
 
 export const revalidate = 300; // Cache for 5 minutes
 
-export async function GET() {
+export async function GET(request: Request) {
+    // Rate limiting check
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = rateLimit(clientId, 'search', RATE_LIMITS.SEARCH);
+
+    if (!rateLimitResult.allowed) {
+        return NextResponse.json(
+            { error: 'Too many requests. Please slow down.' },
+            {
+                status: 429,
+                headers: rateLimitHeaders(rateLimitResult)
+            }
+        );
+    }
+
     try {
         const supabase = await createClient();
 
