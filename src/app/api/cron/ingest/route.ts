@@ -6,15 +6,22 @@ import { NextResponse } from 'next/server';
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
 
-// Initialize Supabase Client (Service Role for Admin Access)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Will be initialized lazily in the handler
+let supabase: ReturnType<typeof createClient> | null = null;
 
-if (!supabaseUrl || !supabaseKey) {
-    throw new Error('CRON_INGEST: Missing required environment variables NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+function getSupabaseClient() {
+    if (supabase) return supabase;
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    }
+
+    supabase = createClient(supabaseUrl, supabaseKey);
+    return supabase;
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs'; // Explicit: jsdom requires Node.js runtime
@@ -144,7 +151,7 @@ export async function GET(request: Request) {
                 if (!item.link || !item.title) continue;
 
                 // Check if exists
-                const { data: existing } = await supabase
+                const { data: existing } = await getSupabaseClient()
                     .from('articles')
                     .select('id')
                     .eq('url', item.link)
@@ -191,7 +198,7 @@ export async function GET(request: Request) {
 
                 const relatedImages = getRelatedImages(polished.category, imageUrl);
 
-                const { error } = await supabase.from('articles').insert({
+                const { error } = await getSupabaseClient().from('articles').insert({
                     title: polished.headline,
                     url: item.link,
                     summary: polished.summary,
