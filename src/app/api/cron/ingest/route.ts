@@ -112,125 +112,134 @@ function getRelatedImages(category: string, mainImage: string): string[] {
 }
 
 export async function GET(request: Request) {
-    // Security Check
-    const { searchParams } = new URL(request.url);
-    const key = searchParams.get('key');
-    const authHeader = request.headers.get('authorization');
+    try {
+        // Security Check
+        const { searchParams } = new URL(request.url);
+        const key = searchParams.get('key');
+        const authHeader = request.headers.get('authorization');
 
-    if (key !== process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const isDev = process.env.NODE_ENV === 'development';
-    if (isDev) console.log("Starting automated ingestion...");
-    const parser = new Parser({
-        customFields: {
-            item: [
-                ['media:content', 'mediaContent', { keepArray: true }],
-                ['media:group', 'mediaGroup'],
-                ['enclosure', 'enclosure']
-            ]
+        if (key !== process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-    });
 
-    let processedCount = 0;
-    let errorCount = 0;
-
-    // Shuffle feeds to avoid always hitting the same ones first if we timeout
-    const shuffledFeeds = [...FEEDS].sort(() => Math.random() - 0.5);
-
-    for (const url of shuffledFeeds) {
-        // Break if we've processed enough for one run (to avoid timeout)
-        if (processedCount >= 3) break; // Limited to 3 for Gemini free tier rate limits
-
-        try {
-            const feed = await parser.parseURL(url);
-
-            // Take only top 2 items from each feed to spread coverage
-            for (const item of feed.items.slice(0, 2)) {
-                if (!item.link || !item.title) continue;
-
-                // Check if exists
-                const { data: existing } = await getSupabaseClient()
-                    .from('articles')
-                    .select('id')
-                    .eq('url', item.link)
-                    .single();
-
-                if (existing) continue;
-
-                // Fetch full content
-                let fullContent = item.contentSnippet || item.content || "";
-                try {
-                    const response = await fetch(item.link, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GlobalAINews/1.0;)' } });
-                    if (response.ok) {
-                        const html = await response.text();
-                        const dom = new JSDOM(html, { url: item.link });
-                        const reader = new Readability(dom.window.document);
-                        const article = reader.parse();
-                        if (article && article.textContent) {
-                            fullContent = article.textContent;
-                        }
-                    }
-                } catch (err) {
-                    console.warn(`Failed to fetch full content for ${item.link}:`, err);
-                }
-
-                // Delay before AI call to avoid rate limits
-                await new Promise(r => setTimeout(r, 3000));
-
-                const polished = await polishContent(fullContent, item.title);
-
-                // Extract Image
-                let imageUrl = null;
-                if (item.mediaContent && item.mediaContent.length > 0) {
-                    imageUrl = item.mediaContent[0].$.url;
-                } else if (item.enclosure && item.enclosure.url) {
-                    imageUrl = item.enclosure.url;
-                } else if (item.content) {
-                    const imgMatch = item.content.match(/<img[^>]+src="([^">]+)"/);
-                    if (imgMatch) imageUrl = imgMatch[1];
-                }
-
-                if (!imageUrl) {
-                    imageUrl = getImageForCategory(polished.category);
-                }
-
-                const relatedImages = getRelatedImages(polished.category, imageUrl);
-
-                const { error } = await getSupabaseClient().from('articles').insert({
-                    title: polished.headline,
-                    url: item.link,
-                    summary: polished.summary,
-                    content: polished.content, // Save the full AI-written content
-                    source: feed.title || 'Unknown',
-                    published_at: new Date().toISOString(),
-                    category: polished.category,
-                    subcategory: polished.subcategory,
-                    image_url: imageUrl,
-                    images: relatedImages,
-                    status: 'published' // Auto-publish for now
-                } as any);
-
-                if (error) {
-                    console.error("DB Error:", error);
-                    errorCount++;
-                } else {
-                    processedCount++;
-                }
+        const isDev = process.env.NODE_ENV === 'development';
+        if (isDev) console.log("Starting automated ingestion...");
+        const parser = new Parser({
+            customFields: {
+                item: [
+                    ['media:content', 'mediaContent', { keepArray: true }],
+                    ['media:group', 'mediaGroup'],
+                    ['enclosure', 'enclosure']
+                ]
             }
-        } catch (e) {
-            console.error(`Feed Error (${url}):`, e);
-            errorCount++;
-            // Continue to next feed instead of crashing
-            continue;
-        }
-    }
+        });
 
-    return NextResponse.json({
-        success: true,
-        processed: processedCount,
-        errors: errorCount,
-        message: `Ingested ${processedCount} new articles.`
-    });
+        let processedCount = 0;
+        let errorCount = 0;
+
+        // Shuffle feeds to avoid always hitting the same ones first if we timeout
+        const shuffledFeeds = [...FEEDS].sort(() => Math.random() - 0.5);
+
+        for (const url of shuffledFeeds) {
+            // Break if we've processed enough for one run (to avoid timeout)
+            if (processedCount >= 3) break; // Limited to 3 for Gemini free tier rate limits
+
+            try {
+                const feed = await parser.parseURL(url);
+
+                // Take only top 2 items from each feed to spread coverage
+                for (const item of feed.items.slice(0, 2)) {
+                    if (!item.link || !item.title) continue;
+
+                    // Check if exists
+                    const { data: existing } = await getSupabaseClient()
+                        .from('articles')
+                        .select('id')
+                        .eq('url', item.link)
+                        .single();
+
+                    if (existing) continue;
+
+                    // Fetch full content
+                    let fullContent = item.contentSnippet || item.content || "";
+                    try {
+                        const response = await fetch(item.link, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GlobalAINews/1.0;)' } });
+                        if (response.ok) {
+                            const html = await response.text();
+                            const dom = new JSDOM(html, { url: item.link });
+                            const reader = new Readability(dom.window.document);
+                            const article = reader.parse();
+                            if (article && article.textContent) {
+                                fullContent = article.textContent;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn(`Failed to fetch full content for ${item.link}:`, err);
+                    }
+
+                    // Delay before AI call to avoid rate limits
+                    await new Promise(r => setTimeout(r, 3000));
+
+                    const polished = await polishContent(fullContent, item.title);
+
+                    // Extract Image
+                    let imageUrl = null;
+                    if (item.mediaContent && item.mediaContent.length > 0) {
+                        imageUrl = item.mediaContent[0].$.url;
+                    } else if (item.enclosure && item.enclosure.url) {
+                        imageUrl = item.enclosure.url;
+                    } else if (item.content) {
+                        const imgMatch = item.content.match(/<img[^>]+src="([^">]+)"/);
+                        if (imgMatch) imageUrl = imgMatch[1];
+                    }
+
+                    if (!imageUrl) {
+                        imageUrl = getImageForCategory(polished.category);
+                    }
+
+                    const relatedImages = getRelatedImages(polished.category, imageUrl);
+
+                    const { error } = await getSupabaseClient().from('articles').insert({
+                        title: polished.headline,
+                        url: item.link,
+                        summary: polished.summary,
+                        content: polished.content, // Save the full AI-written content
+                        source: feed.title || 'Unknown',
+                        published_at: new Date().toISOString(),
+                        category: polished.category,
+                        subcategory: polished.subcategory,
+                        image_url: imageUrl,
+                        images: relatedImages,
+                        status: 'published' // Auto-publish for now
+                    } as any);
+
+                    if (error) {
+                        console.error("DB Error:", error);
+                        errorCount++;
+                    } else {
+                        processedCount++;
+                    }
+                }
+            } catch (e) {
+                console.error(`Feed Error (${url}):`, e);
+                errorCount++;
+                // Continue to next feed instead of crashing
+                continue;
+            }
+        }
+
+        return NextResponse.json({
+            success: true,
+            processed: processedCount,
+            errors: errorCount,
+            message: `Ingested ${processedCount} new articles.`
+        });
+    } catch (error: any) {
+        console.error("CRON_FATAL_ERROR:", error);
+        return NextResponse.json({
+            error: 'Internal Server Error',
+            details: error.message,
+            stack: error.stack
+        }, { status: 500 });
+    }
 }
