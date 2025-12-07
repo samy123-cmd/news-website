@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import Parser from 'rss-parser';
 import { polishContent } from "@/lib/ai/polisher";
 import { NextResponse } from 'next/server';
-import { JSDOM } from 'jsdom';
+import { parseHTML } from 'linkedom';
 import { Readability } from '@mozilla/readability';
 
 // Will be initialized lazily in the handler
@@ -166,8 +166,8 @@ export async function GET(request: Request) {
                         const response = await fetch(item.link, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GlobalAINews/1.0;)' } });
                         if (response.ok) {
                             const html = await response.text();
-                            const dom = new JSDOM(html, { url: item.link });
-                            const reader = new Readability(dom.window.document);
+                            const { document } = parseHTML(html);
+                            const reader = new Readability(document);
                             const article = reader.parse();
                             if (article && article.textContent) {
                                 fullContent = article.textContent;

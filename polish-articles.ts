@@ -8,7 +8,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { polishContent } from './src/lib/ai/polisher';
-import { JSDOM } from 'jsdom';
+import { parseHTML } from 'linkedom';
 import { Readability } from '@mozilla/readability';
 
 // Load .env.local explicitly
@@ -46,8 +46,8 @@ async function scrapeContent(url: string): Promise<string> {
         const html = await response.text();
 
         try {
-            const dom = new JSDOM(html, { url });
-            const reader = new Readability(dom.window.document);
+            const { document } = parseHTML(html);
+            const reader = new Readability(document);
             const article = reader.parse();
             return article?.textContent || '';
         } catch (parseError) {

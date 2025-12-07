@@ -1,6 +1,6 @@
 "use server";
 
-import { JSDOM } from 'jsdom';
+import { parseHTML } from 'linkedom';
 import { Readability } from '@mozilla/readability';
 import sanitizeHtml from 'sanitize-html';
 
@@ -26,8 +26,7 @@ export async function scrapeArticle(url: string): Promise<ScrapedArticle | null>
         }
 
         const html = await response.text();
-        const dom = new JSDOM(html, { url });
-        const document = dom.window.document;
+        const { document } = parseHTML(html);
 
         // Extract all images before Readability potentially removes them
         const imageElements = Array.from(document.querySelectorAll('img'));
