@@ -53,19 +53,20 @@ export function FeaturedArticle({ article }: { article: Article }) {
             <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 z-20 pointer-events-none">
                 <div className="space-y-6 max-w-4xl pointer-events-auto">
                     {/* Badge & Meta */}
+                    {/* Badge & Meta */}
                     <div className="flex items-center gap-4 flex-wrap">
-                        <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full shadow-lg flex items-center gap-1">
-                            <Sparkles className="w-3 h-3" /> Featured Story
+                        <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full shadow-lg flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-accent" /> Featured Story
                         </span>
-                        <div className="flex items-center space-x-3 text-sm font-medium text-white/90 uppercase tracking-widest">
-                            <span className="text-accent">{article.source}</span>
+                        <div className="flex items-center space-x-3 text-sm font-medium text-white/80 uppercase tracking-widest">
+                            <span className="text-white font-bold">{article.source}</span>
                             <span className="text-white/40">•</span>
                             <span>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                     </div>
 
                     {/* Headline */}
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold leading-[1.1] text-white group-hover:text-primary transition-colors drop-shadow-lg tracking-tight">
+                    <h2 className="text-4xl md:text-5xl lg:text-7xl font-heading font-bold leading-[1.05] text-white drop-shadow-lg tracking-tight">
                         {article.title}
                     </h2>
 

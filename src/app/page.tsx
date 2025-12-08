@@ -9,6 +9,7 @@ import { NewsFeed } from "@/components/NewsFeed";
 
 import { NewsFeedSkeleton } from "@/components/NewsFeedSkeleton";
 import { getLatestNews } from "./actions";
+import { SubmitPromo } from "@/components/SubmitPromo";
 
 export const revalidate = 30;
 
@@ -90,10 +91,15 @@ export default async function Home({ searchParams }: HomeProps) {
 
 
 
+
+
       {/* Trending Bar */}
       <div className="mt-16 relative z-10">
         <TrendingBar />
       </div>
+
+      {/* Promote Submission Feature */}
+      <SubmitPromo />
 
       {/* Main Content Area */}
       <div className="container mx-auto px-4 pb-8">

@@ -47,8 +47,21 @@ export async function ArticleSidebar({ currentArticleId, category }: ArticleSide
                         <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2 ring-1 ring-primary/50">
                             <Sparkles className="w-6 h-6 text-primary" />
                         </div>
-
-                        <p className="text-[10px] text-white/40">No spam, unsubscribe anytime.</p>
+                        <div className="text-center">
+                            <h4 className="font-bold text-white text-sm mb-1">Daily Briefing</h4>
+                            <p className="text-xs text-muted-foreground/80 mb-4">The most important AI news, curated for you.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <input
+                                type="email"
+                                placeholder="Your email address"
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+                            />
+                            <button className="w-full bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-lg shadow-primary/20">
+                                Subscribe Free
+                            </button>
+                        </div>
+                        <p className="text-[10px] text-white/40 text-center">No spam, unsubscribe anytime.</p>
                     </div>
                 </div>
 

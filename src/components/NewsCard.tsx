@@ -116,7 +116,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="group flex flex-col h-full overflow-hidden rounded-xl glass-card border border-white/5 hover:border-primary/50 hover:shadow-[0_0_30px_-5px_rgba(30,167,255,0.3)] transition-all duration-500 hover:-translate-y-2 relative"
+            className="group flex flex-col h-full overflow-hidden rounded-xl glass-card border border-white/5 hover:border-primary/30 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] transition-all duration-500 hover:-translate-y-1 relative"
         >
             {/* Image Section */}
             <Link href={`/article/${article.id}`} onClick={handleArticleClick} className="relative h-52 overflow-hidden block cursor-pointer">
@@ -174,7 +174,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Link href={`/article/${article.id}`} className="block">
-                                <h3 className="font-heading text-xl font-bold leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-3 tracking-tight">
+                                <h3 className="font-heading text-2xl font-bold leading-snug text-foreground group-hover:text-primary transition-colors line-clamp-3 tracking-tight">
                                     {displayTitle}
                                 </h3>
                             </Link>
@@ -223,19 +223,9 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                     </div>
                 </div>
 
-                {/* Hover Action Overlay - Visual Gradient */}
-                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0b1624] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20" />
+                {/* Hover Action Overlay - Visual Gradient Removed for cleaner look */}
 
-                {/* Read Full Story Link - Interactive Layer */}
-                {/* Always visible on mobile (opacity-100), hover-only on desktop (md:opacity-0) */}
-                <div className="absolute inset-x-0 bottom-6 flex justify-center z-20 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    <Link
-                        href={`/article/${article.id}`}
-                        className="relative z-40 text-primary text-xs font-bold flex items-center gap-1 translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto cursor-pointer bg-black/40 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 hover:bg-primary hover:text-white hover:border-primary/50 shadow-lg"
-                    >
-                        Read Full Story <ArrowRight className="w-3 h-3" />
-                    </Link>
-                </div>
+                {/* Read Full Story Link - Removed to reduce clutter, whole card is clickable */}
             </div>
         </motion.div>
     );

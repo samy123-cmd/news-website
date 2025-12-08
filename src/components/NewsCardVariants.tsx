@@ -143,7 +143,7 @@ export function NewsCardFeatured({ article }: { article: Article }) {
                     <span>{formatDistanceToNow(new Date(article.published_at), { addSuffix: true })}</span>
                 </div>
 
-                <h2 className="text-2xl lg:text-4xl font-heading font-bold text-white leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-3">
+                <h2 className="text-2xl lg:text-4xl font-heading font-bold text-white leading-tight mb-4 drop-shadow-md line-clamp-3">
                     {article.title}
                 </h2>
 

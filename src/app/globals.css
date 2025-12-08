@@ -153,18 +153,27 @@ h3,
 }
 
 /* Ticker Animation */
+/* Ticker Animation - Seamless Loop for 3 sets of items */
 @keyframes ticker {
   0% {
     transform: translateX(0);
   }
 
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-33.333333%);
   }
 }
 
 .animate-ticker {
   animation: ticker 60s linear infinite;
+  /* Ensure hardware acceleration for smooth scrolling */
+  will-change: transform;
+}
+
+/* Linear Fade Mask for Ticker */
+.mask-linear-fade {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
 @keyframes shimmer {

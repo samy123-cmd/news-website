@@ -74,7 +74,8 @@ export function Header() {
         { name: "Opinion", href: "/?category=Opinion" },
     ];
 
-    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    // Date moved to inline render
+    // const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
     return (
         <header
@@ -88,9 +89,8 @@ export function Header() {
             <div className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-primary via-accent to-primary w-full origin-left transform transition-transform duration-100 ease-out opacity-80" style={{ transform: `scaleX(${readingProgress / 100})` }} />
 
             <div className="container mx-auto px-4">
-                {/* ... (rest of header content) ... */}
                 <div className="flex items-center justify-between relative h-16 lg:h-auto">
-                    {/* Left: Logo & Date */}
+                    {/* Left: Logo */}
                     <div className="flex items-center gap-3 lg:gap-6">
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative w-8 h-8 lg:w-9 lg:h-9">
@@ -108,40 +108,48 @@ export function Header() {
                                 </span>
                             </div>
                         </Link>
+                    </div>
 
-                        <div className="hidden xl:flex items-center gap-3 pl-6 border-l border-white/10 text-xs text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                                <CalendarIcon className="w-3.5 h-3.5 text-primary/70" />
-                                <span className="font-medium">{currentDate}</span>
-                            </div>
-                            <LocationWeather />
+                    {/* Date & Weather Widget (Desktop) */}
+                    <div className="hidden lg:flex items-center gap-6 ml-8 pl-8 border-l border-white/10 h-10 mr-12">
+                        <div className="flex flex-col justify-center">
+                            <span className="text-xs font-bold text-foreground">
+                                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                                Today's Paper
+                            </span>
                         </div>
+                        <LocationWeather />
                     </div>
 
                     {/* Center: Mega Nav */}
-                    <nav className="hidden lg:flex items-center gap-0.5 bg-white/5 rounded-full px-1.5 py-1 border border-white/5 backdrop-blur-sm relative z-50">
+                    <nav className="hidden lg:flex items-center gap-8 relative z-50">
                         {navLinks.map((link) => {
                             const isActive = currentCategory === link.name || (link.name === "World" && !currentCategory);
                             return (
                                 <div
                                     key={link.name}
                                     onMouseEnter={() => link.subcategories && setActiveDropdown(link.name)}
-                                    className="relative"
+                                    className="relative group h-16 flex items-center"
                                 >
                                     <Link
                                         href={link.href}
                                         onClick={() => setActiveDropdown(null)}
                                         className={cn(
-                                            "relative px-3 py-1.5 text-xs lg:text-sm font-bold transition-all duration-300 flex items-center gap-1 rounded-full group",
+                                            "relative text-sm font-bold transition-colors duration-300 flex items-center gap-1.5 tracking-wide",
                                             isActive
-                                                ? "text-white bg-primary/20 shadow-[0_0_10px_rgba(30,167,255,0.2)]"
-                                                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                                ? "text-primary"
+                                                : "text-muted-foreground hover:text-foreground"
                                         )}
                                     >
                                         {link.name}
+                                        {isActive && (
+                                            <span className="absolute bottom-4 left-0 w-full h-0.5 bg-primary shadow-[0_0_8px_rgba(56,189,248,0.5)] rounded-full" />
+                                        )}
                                         {link.subcategories && (
                                             <ChevronDown className={cn(
-                                                "w-2.5 h-2.5 transition-transform duration-300 opacity-50",
+                                                "w-3 h-3 transition-transform duration-300 opacity-40",
                                                 activeDropdown === link.name ? "rotate-180 opacity-100" : "group-hover:opacity-100"
                                             )} />
                                         )}
@@ -152,27 +160,22 @@ export function Header() {
                     </nav>
 
                     {/* Right: Actions */}
-                    <div className="hidden lg:flex items-center gap-2">
+                    <div className="hidden lg:flex items-center gap-4 ml-8 pl-8 border-l border-white/10">
                         <button
                             onClick={() => setSearchOpen(true)}
-                            className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 transition-all duration-300 hover:border-primary/30 hover:bg-white/10 text-muted-foreground hover:text-foreground w-auto xl:w-40"
+                            className="flex items-center justify-center w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-all duration-300 border border-white/5 hover:border-white/20 group"
+                            aria-label="Search"
                         >
-                            <Search className="w-3.5 h-3.5" />
-                            <span className="text-xs hidden xl:inline">Search...</span>
-                            <span className="ml-auto text-[10px] bg-white/5 px-1 py-0.5 rounded border border-white/5 hidden xl:inline">⌘K</span>
+                            <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         </button>
                         <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-                        <Link
-                            href="/submit"
-                            className="hidden 2xl:flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
-                        >
-                            Submit
-                        </Link>
+                        <div className="h-6 w-px bg-white/10" />
 
-                        <Button size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 rounded-full px-4 h-8 text-xs font-bold relative overflow-hidden group">
+
+
+                        <Button size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(30,167,255,0.3)] hover:shadow-[0_0_25px_rgba(30,167,255,0.5)] rounded-full px-5 h-9 text-xs font-bold uppercase tracking-widest relative overflow-hidden group transition-all duration-300 transform hover:-translate-y-0.5">
                             <span className="relative z-10">Subscribe</span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
                         </Button>
                         <ThemeToggle />
                     </div>

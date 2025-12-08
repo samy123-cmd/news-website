@@ -43,4 +43,12 @@ next-env.d.ts
 .vercel
 
 # Sentry Config File
+
+# Sentry Config File
 .env.sentry-build-plugin
+
+# Clutter & Scripts
+*.txt
+populate.ts
+*.log
+unused/

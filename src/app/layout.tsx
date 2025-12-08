@@ -7,7 +7,7 @@ import { LanguageProvider } from "@/lib/context/LanguageContext";
 import { BookmarkProvider } from "@/lib/context/BookmarkContext";
 import { TopBar } from "@/components/TopBar";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { MegaFooter } from "@/components/MegaFooter";
 import JsonLd from "@/components/seo/JsonLd";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
@@ -117,7 +117,7 @@ export default function RootLayout({
                       {children}
                       <Analytics />
                     </main>
-                    <Footer />
+                    <MegaFooter />
                   </div>
                 </TooltipProvider>
               </ToastProvider>
