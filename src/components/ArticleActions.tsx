@@ -3,7 +3,7 @@
 import { Bookmark, Share2, Check } from "lucide-react";
 import { useBookmarks } from "@/lib/context/BookmarkContext";
 import { useToast } from "@/components/ui/Toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface ArticleActionsProps {
@@ -24,6 +24,12 @@ export function ArticleActions({ article }: ArticleActionsProps) {
     const { showToast } = useToast();
     const [isSharing, setIsSharing] = useState(false);
 
+    const [currentUrl, setCurrentUrl] = useState("");
+
+    useEffect(() => {
+        setCurrentUrl(window.location.href);
+    }, []);
+
     const isSaved = isBookmarked(article.id);
 
     const handleBookmark = () => {
@@ -39,14 +45,14 @@ export function ArticleActions({ article }: ArticleActionsProps) {
         const shareData = {
             title: article.title,
             text: article.summary,
-            url: window.location.href,
+            url: currentUrl,
         };
 
         try {
             if (navigator.share) {
                 await navigator.share(shareData);
             } else {
-                await navigator.clipboard.writeText(window.location.href);
+                await navigator.clipboard.writeText(currentUrl);
                 showToast("Link copied to clipboard", "success");
             }
         } catch (err) {
@@ -75,7 +81,7 @@ export function ArticleActions({ article }: ArticleActionsProps) {
             <div className="h-4 w-px bg-border/50 mx-1" />
 
             <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}&via=GlobalAINews`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(currentUrl)}&via=GlobalAINews`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2] rounded-full transition-colors text-muted-foreground"
@@ -86,7 +92,7 @@ export function ArticleActions({ article }: ArticleActionsProps) {
             </a>
 
             <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2] rounded-full transition-colors text-muted-foreground"
@@ -97,7 +103,7 @@ export function ArticleActions({ article }: ArticleActionsProps) {
             </a>
 
             <a
-                href={`https://wa.me/?text=${encodeURIComponent(article.title + " " + window.location.href)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(article.title + " " + currentUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 hover:bg-[#25D366]/10 hover:text-[#25D366] rounded-full transition-colors text-muted-foreground"

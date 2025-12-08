@@ -142,7 +142,7 @@ export async function GET(request: Request) {
 
         for (const url of shuffledFeeds) {
             // Break if we've processed enough for one run (to avoid timeout)
-            if (processedCount >= 2) break; // Limited to 2 for Vercel Hobby Tier timeout safety (10s limit)
+            if (processedCount >= 1) break; // Reduced to 1 for absolute safety on Vercel Hobby Tier (10s limit)
 
             try {
                 const feed = await parser.parseURL(url);

@@ -115,7 +115,21 @@ export async function polishContent(text: string, originalHeadline: string): Pro
                 throw retryError;
             }
         }
-    } catch (error) {
+    } catch (error: any) {
+        // Handle Rate Limits gracefully
+        if (error.message?.includes('429') || error.status === 429) {
+            console.warn(`[Content Polisher] Rate limit hit for "${originalHeadline}". Returning fallback.`);
+            return {
+                headline: originalHeadline,
+                summary: text.substring(0, 200) + "...",
+                content: `<p>${text}</p><div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg my-4 text-yellow-200 text-sm"><p><strong>Note:</strong> Our AI editors are currently at maximum capacity. This article is displayed in its raw format and will be polished automatically when capacity frees up.</p></div>`,
+                category: "General",
+                subcategory: "News",
+                sentiment: "neutral",
+                readTime: "1 min"
+            };
+        }
+
         console.error("Error polishing content:", error);
         return {
             headline: originalHeadline,

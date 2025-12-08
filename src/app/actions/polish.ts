@@ -14,9 +14,9 @@ export async function polishArticleAction(articleId: string, articleUrl: string,
         // 1. Scrape full content
         const rawText = await scrapeArticleContent(articleUrl);
 
-        if (!rawText || rawText.length < 200) {
-            if (isDev) console.log(`[Polisher] Scraped content too short for ${articleId}`);
-            return { success: false, message: "Could not scrape sufficient content" };
+        if (!rawText || rawText.length < 50) {
+            if (isDev) console.log(`[Polisher] Scraped content very short/empty for ${articleId}, relying on AI generation from title.`);
+            // Continue! Don't return error.
         }
 
         // 2. Polish with AI

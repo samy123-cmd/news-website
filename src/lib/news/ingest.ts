@@ -176,6 +176,10 @@ export async function ingestNews(limit?: number, category?: string) {
                 if (!error) {
                     results.push(polished.headline);
                 }
+
+                // Add 5-second delay for Free Tier Rate Limits (15 RPM)
+                if (isDev) console.log("   ⏳ Cooldown (5s) for API limits...");
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
         } catch (e) {
             console.error(`Error fetching ${feedConfig.url}:`, e);
