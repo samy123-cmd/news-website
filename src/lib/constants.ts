@@ -55,3 +55,13 @@ export function getImageForCategory(category: string): string {
     const images = CATEGORY_IMAGES[category] || CATEGORY_IMAGES["General"];
     return images[Math.floor(Math.random() * images.length)];
 }
+
+export const REGIONS: Record<string, { title: string; category: string }> = {
+    "united-states": { title: "United States", category: "USA" },
+    "india": { title: "India", category: "India" },
+    "united-kingdom": { title: "United Kingdom", category: "UK" },
+    "europe": { title: "Europe", category: "Europe" },
+    "asia-pacific": { title: "Asia Pacific", category: "Asia" },
+    "middle-east": { title: "Middle East", category: "Middle East" },
+    "africa": { title: "Africa", category: "Africa" },
+};

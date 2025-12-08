@@ -4,15 +4,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 // Map slugs to display names and categories
-export const REGIONS: Record<string, { title: string; category: string }> = {
-    "united-states": { title: "United States", category: "USA" },
-    "india": { title: "India", category: "India" },
-    "united-kingdom": { title: "United Kingdom", category: "UK" },
-    "europe": { title: "Europe", category: "Europe" },
-    "asia-pacific": { title: "Asia Pacific", category: "Asia" },
-    "middle-east": { title: "Middle East", category: "Middle East" },
-    "africa": { title: "Africa", category: "Africa" },
-};
+import { REGIONS } from "@/lib/constants";
 
 export const dynamic = 'force-dynamic';
 

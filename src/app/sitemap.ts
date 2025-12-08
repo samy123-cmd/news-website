@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { REGIONS } from './edition/[region]/page';
+import { REGIONS } from '@/lib/constants';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
