@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 // Map slugs to display names and categories
-const REGIONS: Record<string, { title: string; category: string }> = {
+export const REGIONS: Record<string, { title: string; category: string }> = {
     "united-states": { title: "United States", category: "USA" },
     "india": { title: "India", category: "India" },
     "united-kingdom": { title: "United Kingdom", category: "UK" },

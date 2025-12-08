@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { REGIONS } from './edition/[region]/page';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
@@ -12,9 +13,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Fetch all articles
     const { data: articles } = await supabase
         .from('articles')
-        .select('id, published_at, category')
+        .select('id, published_at')
         .order('published_at', { ascending: false })
-        .limit(1000);
+        .limit(5000);
 
     const articleUrls = (articles || []).map((article) => ({
         url: `${BASE_URL}/article/${article.id}`,
@@ -31,6 +32,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
     }));
 
+    // Regional Editions
+    const regionUrls = Object.keys(REGIONS).map((slug) => ({
+        url: `${BASE_URL}/edition/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'hourly' as const,
+        priority: 0.85,
+    }));
+
     return [
         {
             url: BASE_URL,
@@ -39,7 +48,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 1,
         },
         {
-            url: `${BASE_URL}/about`,
+            url: `${BASE_URL}/headlines`,
+            lastModified: new Date(),
+            changeFrequency: 'hourly',
+            priority: 0.9,
+        },
+        {
+            url: `${BASE_URL}/about-us`,
             lastModified: new Date(),
             changeFrequency: 'monthly',
             priority: 0.5,
@@ -60,6 +75,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             url: `${BASE_URL}/site-map`,
             lastModified: new Date(),
             changeFrequency: 'weekly',
+            priority: 0.6,
+        },
+        {
+            url: `${BASE_URL}/submit`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
             priority: 0.6,
         },
         {
@@ -84,7 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             url: `${BASE_URL}/rss-feeds`,
             lastModified: new Date(),
             changeFrequency: 'weekly',
-            priority: 0.6,
+            priority: 0.7,
         },
         {
             url: `${BASE_URL}/newsletters`,
@@ -111,6 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.5,
         },
         ...categoryUrls,
+        ...regionUrls,
         ...articleUrls,
     ];
 }
