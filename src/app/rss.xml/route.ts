@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
-const BASE_URL = 'https://ainews-olive.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
 export async function GET() {
     const supabase = await createClient();
