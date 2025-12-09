@@ -25,127 +25,125 @@ export async function polishContent(text: string, originalHeadline: string): Pro
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-001",
-        generationConfig: { responseMimeType: "application/json" }
-    });
 
-    const MAX_RETRIES = 3;
-    let attempt = 0;
+    // List of models to try in order of preference
+    const modelsToTry = [
+        "gemini-1.5-flash-001",
+        "gemini-1.5-flash",
+        "gemini-pro",
+        "gemini-1.0-pro"
+    ];
 
-    // Retry Loop for Rate Limits (429)
-    while (attempt < MAX_RETRIES) {
+    let lastError;
+
+    for (const modelName of modelsToTry) {
         try {
-            const prompt = `
-      Act as a senior editor for a premium news agency (like BBC/CNN/Reuters). 
-      Your task is to "polish" the following news content into a high-quality, engaging article.
-      
-      Input Headline: "${originalHeadline}"
-      Input Text: "${text}"
+            // if (process.env.NODE_ENV === 'development') console.log(`[Content Polisher] Attempting with model: ${modelName}`);
 
-      IMPORTANT: If the Input Text is short (e.g., just a summary or snippet), you MUST expand upon it significantly using your general knowledge and context about the topic to create a full-length article. Do not just repeat the input.
+            const model = genAI.getGenerativeModel({
+                model: modelName,
+                generationConfig: { responseMimeType: "application/json" }
+            });
 
-      1. **Refine the Headline**: Create a compelling, click-worthy, yet credible headline. Avoid clickbait, but make it intriguing. Max 15 words.
-      2. **Summarize**: Create a "Key Takeaways" style summary (bullet points preferred, max 150 words).
-      3. **Write Article**: Write a detailed, engaging, and comprehensive news article (at least 400-600 words). 
-         - Use HTML formatting: <h3> for subheadings, <p> for paragraphs, <ul>/<li> for lists. 
-         - Do NOT use <h1> or <h2>. 
-         - Adopt a neutral, authoritative, yet accessible tone.
-         - **LANGUAGE RULE**: If the input text is in Hindi, the output (Headline, Summary, Article) MUST be in Hindi. Do NOT translate Hindi inputs to English.
-      4. **Categorize**: Assign a main Category from this EXACT list: [World, Politics, Business, Technology, Sports, Entertainment, Science, Opinion, India]. 
-         - If it's specifically about Indian national news, politics, or events, use "India".
-         - If it's about space/nature/discovery, use "Science".
-         - If it's a review/gadget/software, use "Technology".
-         - If it's a movie/celebrity, use "Entertainment".
-         - If it's a match/player, use "Sports".
-         - If it's an editorial/commentary, use "Opinion".
-         - ONLY use "General" if it absolutely fits none of the above.
-      5. **Subcategory**: Choose a specific, relevant subcategory (e.g., AI, Space, Cricket, Hollywood, Elections, Markets).
-      6. **Analyze**: Determine sentiment (positive/neutral/negative) and estimate read time (e.g., "4 min").
+            const MAX_RETRIES = 3;
+            let attempt = 0;
 
-      Output JSON ONLY. Do NOT use markdown code blocks. 
-      IMPORTANT: Ensure all double quotes inside strings are properly escaped (e.g., \"text\"). 
-      Do not include any trailing commas.
-      {
-        "headline": "...",
-        "summary": "...",
-        "content": "...",
-        "category": "...",
-        "subcategory": "...",
-        "sentiment": "...",
-        "readTime": "..."
-      }
-    `;
-
-            // Add timeout for AI generation (25s)
-            const timeoutPromise = new Promise<never>((_, reject) =>
-                setTimeout(() => reject(new Error("AI generation timeout")), 25000)
-            );
-
-            const result = await Promise.race([
-                model.generateContent(prompt),
-                timeoutPromise
-            ]) as any;
-
-            const response = await result.response;
-            let jsonString = response.text();
-
-            // Robust JSON extraction: Find the first '{' and the last '}'
-            const firstOpen = jsonString.indexOf('{');
-            const lastClose = jsonString.lastIndexOf('}');
-
-            if (firstOpen !== -1 && lastClose !== -1) {
-                jsonString = jsonString.substring(firstOpen, lastClose + 1);
-            }
-
-            try {
-                return JSON.parse(jsonString);
-            } catch (initialError) {
-                console.warn("Initial JSON parse failed, attempting cleanup...", initialError);
-                // Attempt to fix common JSON issues
-                jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "");
-                jsonString = jsonString.replace(/\\n/g, "\\n").replace(/\\r/g, ""); // Basic escape check
-
+            // Retry Loop for Rate Limits (429) & Model Errors
+            while (attempt < MAX_RETRIES) {
                 try {
-                    return JSON.parse(jsonString);
-                } catch (retryError) {
-                    console.error("Failed to parse JSON after cleanup:", jsonString.substring(0, 200) + "...");
-                    throw retryError;
-                }
-            }
+                    const prompt = `
+                    Act as a senior editor for a premium news agency. 
+                    Structure the output as a valid JSON object.
+                    Input Headline: "${originalHeadline}"
+                    Input Text: "${text.substring(0, 8000)}"
 
-        } catch (error: any) {
-            // Graceful Rate Limit Handling
-            const isRateLimit = error.message?.includes('429') || error.status === 429 || error.toString().includes('429');
+                    1. Refine Headline (Max 15 words)
+                    2. Summarize (Max 150 words)
+                    3. Write Article (400-600 words, HTML format <h3>, <p>, <ul>)
+                    4. Category: [World, Politics, Business, Technology, Sports, Entertainment, Science, Opinion, India]
+                    5. Subcategory, Sentiment, ReadTime.
 
-            if (isRateLimit) {
-                attempt++;
-                if (attempt < MAX_RETRIES) {
-                    // Exponential backoff or specific delay (45s, then 60s, then 90s)
-                    const waitTime = attempt * 45000;
-                    console.warn(`[Content Polisher] 429 Rate Limit hit for "${originalHeadline}". Waiting ${waitTime / 1000}s before retry ${attempt}/${MAX_RETRIES}...`);
-                    await new Promise(resolve => setTimeout(resolve, waitTime));
-                    continue; // Retry logic
-                } else {
-                    console.error(`[Content Polisher] Max retries exhausted for "${originalHeadline}". Using fallback.`);
+                    Output JSON ONLY.
+                    `;
+
+                    // Add timeout for AI generation (30s)
+                    const timeoutPromise = new Promise<never>((_, reject) =>
+                        setTimeout(() => reject(new Error("AI generation timeout")), 30000)
+                    );
+
+                    const result = await Promise.race([
+                        model.generateContent(prompt),
+                        timeoutPromise
+                    ]) as any;
+
+                    const response = await result.response;
+                    let jsonString = response.text();
+
+                    // Robust JSON extraction
+                    const firstOpen = jsonString.indexOf('{');
+                    const lastClose = jsonString.lastIndexOf('}');
+                    if (firstOpen !== -1 && lastClose !== -1) {
+                        jsonString = jsonString.substring(firstOpen, lastClose + 1);
+                    }
+
+                    // Attempt parsing
+                    let polishedData;
+                    try {
+                        polishedData = JSON.parse(jsonString);
+                    } catch (initialError) {
+                        // Simple cleanup attempt
+                        jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").replace(/\\n/g, "\\n");
+                        polishedData = JSON.parse(jsonString);
+                    }
+
+                    // If success, return immediately
+                    return polishedData;
+
+                } catch (error: any) {
+                    const isRateLimit = error.message?.includes('429') || error.status === 429 || error.toString().includes('429');
+
+                    if (isRateLimit) {
+                        attempt++;
+                        if (attempt < MAX_RETRIES) {
+                            const waitTime = attempt * 10000; // 10s, 20s
+                            console.warn(`[Content Polisher] 429 Rate Limit on ${modelName}. Retry ${attempt}...`);
+                            await new Promise(resolve => setTimeout(resolve, waitTime));
+                            continue;
+                        }
+                    }
+
+                    // Check for 404 (Model Not Found) - Break inner loop to try next model
+                    const isNotFound = error.message?.includes('404') || error.status === 404 || error.toString().includes('Not Found');
+                    if (isNotFound) {
+                        throw error; // Throw to outer loop to trigger model switch
+                    }
+
+                    // Other errors? Break inner loop, maybe try next model or just fail
+                    throw error;
                 }
-            } else {
-                console.error("Error polishing content (Non-429):", error);
-                // If it's not a rate limit, usually we break and return fallback
                 break;
             }
+        } catch (e: any) {
+            lastError = e;
+            const isNotFound = e.message?.includes('404') || e.status === 404 || e.toString().includes('Not Found');
+            if (isNotFound) {
+                console.warn(`[Content Polisher] Model ${modelName} not found used. Trying next...`);
+                continue; // Try next model in list
+            }
+            // If it's a non-404 error (like strict parsing or timeout) and we exhausted retries,
+            // we could try the next model just in case the model itself is buggy/slow.
+            console.warn(`[Content Polisher] Issue with ${modelName}: ${e.message}. Trying next...`);
+            continue;
         }
-
-        // If we succeeded (return inside try), we don't reach here.
-        // If we failed (caught error) and didn't continue, we reach here.
-        break;
     }
 
-    // Fallback Return
+    console.error(`[Content Polisher] All models failed. Last error:`, lastError);
+
+    // Final Fallback if ALL models fail
     return {
         headline: originalHeadline,
         summary: text.substring(0, 200) + "...",
-        content: `<p>${text}</p><div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg my-4 text-yellow-200 text-sm"><p><strong>Note:</strong> Our AI editors are currently at maximum capacity. This article is displayed in its raw format and will be polished automatically when capacity frees up.</p></div>`,
+        content: `<p>${text}</p><div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg my-4 text-yellow-200 text-sm"><p><strong>Note:</strong> AI processing unavailable currently. Displaying raw content.</p></div>`,
         category: "General",
         subcategory: "News",
         sentiment: "neutral",
