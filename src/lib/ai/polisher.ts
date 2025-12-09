@@ -74,22 +74,38 @@ export async function polishContent(text: string, originalHeadline: string): Pro
 
             while (attempt < MAX_RETRIES) {
                 try {
-                    const prompt = `
-                    Act as a senior editor for a premium news agency. 
-                    Structure the output as a valid JSON object.
-                    Input Headline: "${originalHeadline}"
-                    Input Text: "${text.substring(0, 8000)}"
+                    const prompt = `You are a senior news editor. Rewrite this article in your own words.
 
-                    1. Refine Headline (Max 15 words)
-                    2. Summarize (Max 150 words)
-                    3. Write Article (400-600 words, HTML format <h3>, <p>, <ul>)
-                    4. Category: [World, Politics, Business, Technology, Sports, Entertainment, Science, Opinion, India]
-                    5. Subcategory, Sentiment, ReadTime.
-                    6. Tags: Array of 3-5 specific entities (e.g. ["Nvidia", "Jensen Huang", "AI Chips"])
-                    7. Curation Note: A 1-sentence explanation of why this story matters (e.g. "Selected because valid regulatory approval significantly impacts the AI hardware market.")
+INPUT:
+Headline: "${originalHeadline}"
+Source Text: "${text.substring(0, 6000)}"
 
-                    Output JSON ONLY.
-                    `;
+CRITICAL REQUIREMENTS:
+1. REWRITE the content completely - DO NOT copy phrases from the source
+2. Use simple, clear language that's easy to understand
+3. Write 400-600 words in the "content" field
+4. Format with HTML: use <h3> for section headers, <p> for paragraphs (2-4 sentences each), <ul>/<li> for lists
+5. Each paragraph MUST be wrapped in <p> tags
+6. Create 4-6 separate paragraphs minimum
+
+OUTPUT JSON FORMAT (use EXACTLY these field names):
+{
+  "headline": "Refined headline (max 15 words)",
+  "summary": "2-3 sentence summary for preview cards (max 150 words)",
+  "content": "<h3>Section Title</h3><p>First paragraph here...</p><p>Second paragraph...</p><p>Third paragraph...</p>...",
+  "category": "One of: World, Politics, Business, Technology, Sports, Entertainment, Science, Opinion, India",
+  "subcategory": "More specific topic",
+  "sentiment": "positive, neutral, or negative",
+  "readTime": "X min read",
+  "tags": ["Entity1", "Entity2", "Entity3"],
+  "curation_note": "One sentence explaining why this story matters"
+}
+
+IMPORTANT: 
+- The "content" field must have multiple <p> tags, not one giant paragraph
+- Rewrite in YOUR words, not copied text
+- Output valid JSON only, no markdown
+`;
 
                     // 30s timeout
                     const timeoutPromise = new Promise<never>((_, reject) =>
