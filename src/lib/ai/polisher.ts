@@ -30,8 +30,13 @@ export async function polishContent(text: string, originalHeadline: string): Pro
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    try {
-        const prompt = `
+    const MAX_RETRIES = 3;
+    let attempt = 0;
+
+    // Retry Loop for Rate Limits (429)
+    while (attempt < MAX_RETRIES) {
+        try {
+            const prompt = `
       Act as a senior editor for a premium news agency (like BBC/CNN/Reuters). 
       Your task is to "polish" the following news content into a high-quality, engaging article.
       
@@ -72,73 +77,78 @@ export async function polishContent(text: string, originalHeadline: string): Pro
       }
     `;
 
-        // Add timeout for AI generation
-        const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("AI generation timeout")), 15000)
-        );
+            // Add timeout for AI generation (25s)
+            const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error("AI generation timeout")), 25000)
+            );
 
-        const result = await Promise.race([
-            model.generateContent(prompt),
-            timeoutPromise
-        ]) as any;
+            const result = await Promise.race([
+                model.generateContent(prompt),
+                timeoutPromise
+            ]) as any;
 
-        const response = await result.response;
-        let jsonString = response.text();
+            const response = await result.response;
+            let jsonString = response.text();
 
-        // Robust JSON extraction: Find the first '{' and the last '}'
-        const firstOpen = jsonString.indexOf('{');
-        const lastClose = jsonString.lastIndexOf('}');
+            // Robust JSON extraction: Find the first '{' and the last '}'
+            const firstOpen = jsonString.indexOf('{');
+            const lastClose = jsonString.lastIndexOf('}');
 
-        if (firstOpen !== -1 && lastClose !== -1) {
-            jsonString = jsonString.substring(firstOpen, lastClose + 1);
-        }
+            if (firstOpen !== -1 && lastClose !== -1) {
+                jsonString = jsonString.substring(firstOpen, lastClose + 1);
+            }
 
-        try {
-            return JSON.parse(jsonString);
-        } catch (initialError) {
-            console.warn("Initial JSON parse failed, attempting cleanup...", initialError);
-
-            // Attempt to fix common JSON issues
-            // 1. Remove markdown code blocks if they survived
-            jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "");
-
-            // 2. Escape unescaped double quotes within string values
-            // This is a complex regex, so we'll try a simpler approach first:
-            // Remove newlines that might break parsing
-            jsonString = jsonString.replace(/\n/g, "\\n").replace(/\r/g, "");
-
-            // 3. Try parsing again
             try {
                 return JSON.parse(jsonString);
-            } catch (retryError) {
-                console.error("Failed to parse JSON after cleanup:", jsonString.substring(0, 200) + "...");
-                throw retryError;
+            } catch (initialError) {
+                console.warn("Initial JSON parse failed, attempting cleanup...", initialError);
+                // Attempt to fix common JSON issues
+                jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "");
+                jsonString = jsonString.replace(/\\n/g, "\\n").replace(/\\r/g, ""); // Basic escape check
+
+                try {
+                    return JSON.parse(jsonString);
+                } catch (retryError) {
+                    console.error("Failed to parse JSON after cleanup:", jsonString.substring(0, 200) + "...");
+                    throw retryError;
+                }
+            }
+
+        } catch (error: any) {
+            // Graceful Rate Limit Handling
+            const isRateLimit = error.message?.includes('429') || error.status === 429 || error.toString().includes('429');
+
+            if (isRateLimit) {
+                attempt++;
+                if (attempt < MAX_RETRIES) {
+                    // Exponential backoff or specific delay (45s, then 60s, then 90s)
+                    const waitTime = attempt * 45000;
+                    console.warn(`[Content Polisher] 429 Rate Limit hit for "${originalHeadline}". Waiting ${waitTime / 1000}s before retry ${attempt}/${MAX_RETRIES}...`);
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                    continue; // Retry logic
+                } else {
+                    console.error(`[Content Polisher] Max retries exhausted for "${originalHeadline}". Using fallback.`);
+                }
+            } else {
+                console.error("Error polishing content (Non-429):", error);
+                // If it's not a rate limit, usually we break and return fallback
+                break;
             }
         }
-    } catch (error: any) {
-        // Handle Rate Limits gracefully
-        if (error.message?.includes('429') || error.status === 429) {
-            console.warn(`[Content Polisher] Rate limit hit for "${originalHeadline}". Returning fallback.`);
-            return {
-                headline: originalHeadline,
-                summary: text.substring(0, 200) + "...",
-                content: `<p>${text}</p><div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg my-4 text-yellow-200 text-sm"><p><strong>Note:</strong> Our AI editors are currently at maximum capacity. This article is displayed in its raw format and will be polished automatically when capacity frees up.</p></div>`,
-                category: "General",
-                subcategory: "News",
-                sentiment: "neutral",
-                readTime: "1 min"
-            };
-        }
 
-        console.error("Error polishing content:", error);
-        return {
-            headline: originalHeadline,
-            summary: text.substring(0, 200) + "...",
-            content: `<p>${text}</p>`,
-            category: "General",
-            subcategory: "News",
-            sentiment: "neutral",
-            readTime: "1 min"
-        };
+        // If we succeeded (return inside try), we don't reach here.
+        // If we failed (caught error) and didn't continue, we reach here.
+        break;
     }
+
+    // Fallback Return
+    return {
+        headline: originalHeadline,
+        summary: text.substring(0, 200) + "...",
+        content: `<p>${text}</p><div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg my-4 text-yellow-200 text-sm"><p><strong>Note:</strong> Our AI editors are currently at maximum capacity. This article is displayed in its raw format and will be polished automatically when capacity frees up.</p></div>`,
+        category: "General",
+        subcategory: "News",
+        sentiment: "neutral",
+        readTime: "1 min"
+    };
 }
