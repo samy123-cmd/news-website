@@ -40,6 +40,8 @@ export function FeaturedArticle({ article }: { article: Article }) {
                         priority
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 60vw"
                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAgEEAQUBAAAAAAAAAAAAAQIDAAQREiEFBhMxQVH/xAAVAQEBAAAAAAAAAAAAAAAAAAADBP/EABkRAAMBAQEAAAAAAAAAAAAAAAABAhEhMf/aAAwDAQACEQMRAD8AqbrvxXWy9x3MnQ/9SlKhdO//2Q=="
                     />
                 ) : (
                     <div className="w-full h-full bg-slate-900" />

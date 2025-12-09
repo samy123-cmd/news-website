@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/Button";
 import { Menu, X, ChevronDown, Search, Calendar as CalendarIcon } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -10,7 +11,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LocationWeather } from "./LocationWeather";
 import { useSearchParams } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
-import { SearchOverlay } from "./SearchOverlay";
+
+// Dynamic import for SearchOverlay - reduces initial bundle size
+const SearchOverlay = dynamic(() => import("./SearchOverlay").then(mod => ({ default: mod.SearchOverlay })), {
+    loading: () => null,
+    ssr: false,
+});
 
 export function Header() {
     const [isScrolled, setIsScrolled] = useState(false);

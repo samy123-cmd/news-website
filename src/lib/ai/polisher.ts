@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getPreferredModel, validateApiKey } from "./validateApiKey";
+import { acquireToken, recordSuccess, recordFailure, waitForBackoff } from "./rateLimiter";
 
 interface PolishedContent {
     headline: string;
@@ -10,48 +12,66 @@ interface PolishedContent {
     readTime: string;
     tags?: string[];
     curation_note?: string;
+    ai_processed?: boolean;
+}
+
+// Fallback response when AI is unavailable
+function createFallbackResponse(text: string, originalHeadline: string, reason: string): PolishedContent {
+    return {
+        headline: originalHeadline,
+        summary: text.substring(0, 200) + "...",
+        content: `<p>${text}</p>`,
+        category: "General",
+        subcategory: "News",
+        sentiment: "neutral",
+        readTime: "1 min",
+        tags: [],
+        curation_note: null as any, // Null = hide section in UI
+        ai_processed: false
+    };
 }
 
 export async function polishContent(text: string, originalHeadline: string): Promise<PolishedContent> {
-    if (!process.env.GEMINI_API_KEY) {
-        // Fallback for dev without keys
-        return {
-            headline: originalHeadline,
-            summary: text.substring(0, 200) + "...",
-            content: `<p>${text}</p>`,
-            category: "General",
-            subcategory: "News",
-            sentiment: "neutral",
-            readTime: "1 min",
-            tags: [],
-            curation_note: "Content gathered from raw feed."
-        };
+    // Step 1: Validate API key and get preferred model
+    const validation = await validateApiKey();
+
+    if (!validation.isValid || !validation.preferredModel) {
+        if (process.env.NODE_ENV === 'development') {
+            console.warn(`[Content Polisher] AI disabled: ${validation.error}`);
+        }
+        return createFallbackResponse(text, originalHeadline, validation.error || "No API key");
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    // Step 2: Acquire rate limit token
+    const canProceed = await acquireToken();
+    if (!canProceed) {
+        console.warn(`[Content Polisher] Rate limit exceeded. Skipping AI polish.`);
+        return createFallbackResponse(text, originalHeadline, "Rate limit");
+    }
 
-    // List of models to try in order of preference
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+    // Build model list: preferred first, then fallbacks
     const modelsToTry = [
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-001",
-        "gemini-1.5-flash-8b"
+        validation.preferredModel,
+        ...validation.availableModels
+            .map(m => m.name)
+            .filter(n => n !== validation.preferredModel)
+            .slice(0, 2) // Max 2 additional fallbacks
     ];
 
-    let lastError;
+    let lastError: any;
+    const MAX_RETRIES = 2;
 
     for (const modelName of modelsToTry) {
         try {
-            // if (process.env.NODE_ENV === 'development') console.log(`[Content Polisher] Attempting with model: ${modelName}`);
-
             const model = genAI.getGenerativeModel({
                 model: modelName,
                 generationConfig: { responseMimeType: "application/json" }
             });
 
-            const MAX_RETRIES = 3;
             let attempt = 0;
 
-            // Retry Loop for Rate Limits (429) & Model Errors
             while (attempt < MAX_RETRIES) {
                 try {
                     const prompt = `
@@ -71,7 +91,7 @@ export async function polishContent(text: string, originalHeadline: string): Pro
                     Output JSON ONLY.
                     `;
 
-                    // Add timeout for AI generation (30s)
+                    // 30s timeout
                     const timeoutPromise = new Promise<never>((_, reject) =>
                         setTimeout(() => reject(new Error("AI generation timeout")), 30000)
                     );
@@ -84,76 +104,68 @@ export async function polishContent(text: string, originalHeadline: string): Pro
                     const response = await result.response;
                     let jsonString = response.text();
 
-                    // Robust JSON extraction
+                    // Extract JSON
                     const firstOpen = jsonString.indexOf('{');
                     const lastClose = jsonString.lastIndexOf('}');
                     if (firstOpen !== -1 && lastClose !== -1) {
                         jsonString = jsonString.substring(firstOpen, lastClose + 1);
                     }
 
-                    // Attempt parsing
+                    // Parse JSON
                     let polishedData;
                     try {
                         polishedData = JSON.parse(jsonString);
-                    } catch (initialError) {
-                        // Simple cleanup attempt
-                        jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").replace(/\\n/g, "\\n");
+                    } catch {
+                        jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "");
                         polishedData = JSON.parse(jsonString);
                     }
 
-                    // If success, return immediately
+                    // Mark as AI processed
+                    polishedData.ai_processed = true;
+
+                    // Record success for rate limiter
+                    recordSuccess();
+
                     return polishedData;
 
                 } catch (error: any) {
-                    const isRateLimit = error.message?.includes('429') || error.status === 429 || error.toString().includes('429');
+                    const isRateLimit = error.message?.includes('429') || error.status === 429;
 
                     if (isRateLimit) {
                         attempt++;
                         if (attempt < MAX_RETRIES) {
-                            const waitTime = attempt * 10000; // 10s, 20s
-                            console.warn(`[Content Polisher] 429 Rate Limit on ${modelName}. Retry ${attempt}...`);
-                            await new Promise(resolve => setTimeout(resolve, waitTime));
+                            await waitForBackoff();
                             continue;
                         }
                     }
 
-                    // Check for 404 (Model Not Found) - Break inner loop to try next model
-                    const isNotFound = error.message?.includes('404') || error.status === 404 || error.toString().includes('Not Found');
+                    // 404 = try next model
+                    const isNotFound = error.message?.includes('404') || error.status === 404;
                     if (isNotFound) {
-                        throw error; // Throw to outer loop to trigger model switch
+                        throw error;
                     }
 
-                    // Other errors? Break inner loop, maybe try next model or just fail
                     throw error;
                 }
-                break;
             }
         } catch (e: any) {
             lastError = e;
-            const isNotFound = e.message?.includes('404') || e.status === 404 || e.toString().includes('Not Found');
+            recordFailure();
+
+            const isNotFound = e.message?.includes('404') || e.status === 404;
             if (isNotFound) {
-                console.warn(`[Content Polisher] Model ${modelName} not found used. Trying next...`);
-                continue; // Try next model in list
+                continue; // Try next model
             }
-            // If it's a non-404 error (like strict parsing or timeout) and we exhausted retries,
-            // we could try the next model just in case the model itself is buggy/slow.
-            console.warn(`[Content Polisher] Issue with ${modelName}: ${e.message}. Trying next...`);
+
+            // For other errors, try next model
             continue;
         }
     }
 
-    console.error(`[Content Polisher] All models failed. Last error:`, lastError);
+    // All models failed
+    if (process.env.NODE_ENV === 'development') {
+        console.warn(`[Content Polisher] All models failed. Last: ${lastError?.message}`);
+    }
 
-    // Final Fallback if ALL models fail
-    return {
-        headline: originalHeadline,
-        summary: text.substring(0, 200) + "...",
-        content: `<p>${text}</p><div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg my-4 text-yellow-200 text-sm"><p><strong>Note:</strong> AI processing unavailable currently. Displaying raw content.</p></div>`,
-        category: "General",
-        subcategory: "News",
-        sentiment: "neutral",
-        readTime: "1 min",
-        tags: [],
-        curation_note: "AI service unavailable."
-    };
+    return createFallbackResponse(text, originalHeadline, lastError?.message || "Unknown error");
 }

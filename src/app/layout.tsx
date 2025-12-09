@@ -17,24 +17,28 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
+  preload: true,
 });
 
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
+  preload: true,
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   display: "swap",
+  preload: false, // Not critical for initial paint
 });
 
 const notoSansDevanagari = Noto_Sans_Devanagari({
   variable: "--font-noto-sans-devanagari",
   subsets: ["devanagari"],
   display: "swap",
+  preload: false, // Only needed for Hindi content
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ainews-olive.vercel.app";

@@ -222,22 +222,25 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 </div>
             </div>
 
-            {/* Curation Note (New Feature) */}
-            {article.curation_note && (
-                <div className="container mx-auto px-4 -mt-8 mb-8 relative z-20">
-                    <div className="max-w-4xl p-4 rounded-xl bg-[#0f172a]/90 border border-indigo-500/30 backdrop-blur-md shadow-2xl">
-                        <div className="flex items-start gap-3">
-                            <div className="p-2 bg-indigo-500/20 rounded-lg shrink-0">
-                                <Sparkles className="w-5 h-5 text-indigo-400" />
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editor's Take</p>
-                                <p className="text-sm text-gray-200 italic leading-relaxed">"{article.curation_note}"</p>
+            {/* Curation Note - Only show if valid content (not AI error messages) */}
+            {article.curation_note &&
+                !article.curation_note.toLowerCase().includes('unavailable') &&
+                !article.curation_note.toLowerCase().includes('error') &&
+                article.curation_note.length > 10 && (
+                    <div className="container mx-auto px-4 -mt-8 mb-8 relative z-20">
+                        <div className="max-w-4xl p-4 rounded-xl bg-[#0f172a]/90 border border-indigo-500/30 backdrop-blur-md shadow-2xl">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-indigo-500/20 rounded-lg shrink-0">
+                                    <Sparkles className="w-5 h-5 text-indigo-400" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editor's Take</p>
+                                    <p className="text-sm text-gray-200 italic leading-relaxed">"{article.curation_note}"</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -245,7 +248,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <Suspense fallback={
                         <div className="lg:col-span-8 flex flex-col items-center justify-center min-h-[400px] space-y-4">
                             <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                            <p className="text-muted-foreground font-medium animate-pulse">AI is polishing this article for you...</p>
+                            <p className="text-muted-foreground font-medium animate-pulse">Loading article...</p>
                         </div>
                     }>
                         <ArticleContent article={article} />

@@ -2,6 +2,14 @@ import { createClient } from "@/lib/supabase/server";
 import { FeaturedArticle } from "./FeaturedArticle";
 import { QuickReads } from "./QuickReads";
 
+interface QuickReadsArticle {
+    id: string;
+    title: string;
+    source: string;
+    published_at: string;
+    url: string;
+}
+
 export async function HeroSection() {
     const supabase = await createClient();
 
@@ -22,11 +30,11 @@ export async function HeroSection() {
     ]);
 
     const featuredData = featuredResult.data;
-    let quickReadsData = quickReadsResult.data || [];
+    let quickReadsData = (quickReadsResult.data || []) as QuickReadsArticle[];
 
     // Filter out the featured article from quick reads
     if (featuredData) {
-        quickReadsData = quickReadsData.filter(a => a.id !== featuredData.id).slice(0, 5);
+        quickReadsData = quickReadsData.filter((a: QuickReadsArticle) => a.id !== featuredData.id).slice(0, 5);
     }
 
     if (!featuredData) return null;

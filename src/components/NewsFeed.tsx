@@ -23,6 +23,8 @@ export async function NewsFeed({ category, subcategory, tag, limit = 20, initial
         let query = supabase
             .from("articles")
             .select("*")
+            // Prioritize AI-processed articles, then by recency
+            .order("ai_processed", { ascending: false, nullsFirst: false })
             .order("published_at", { ascending: false })
             .limit(limit);
 

@@ -2,6 +2,11 @@ import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { REGIONS } from '@/lib/constants';
 
+interface SitemapArticle {
+    id: string;
+    published_at: string;
+}
+
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
 // Categories for sitemap
@@ -17,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .order('published_at', { ascending: false })
         .limit(5000);
 
-    const articleUrls = (articles || []).map((article) => ({
+    const articleUrls = ((articles || []) as SitemapArticle[]).map((article: SitemapArticle) => ({
         url: `${BASE_URL}/article/${article.id}`,
         lastModified: new Date(article.published_at),
         changeFrequency: 'daily' as const,

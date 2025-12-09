@@ -3,6 +3,10 @@
         {
             "path": "/api/cron/ingest",
             "schedule": "0 0 * * *"
+        },
+        {
+            "path": "/api/cron/repolish",
+            "schedule": "0 3 * * *"
         }
     ]
 }

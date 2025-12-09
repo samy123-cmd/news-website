@@ -3,11 +3,8 @@ import sanitizeHtml from 'sanitize-html';
 import { Sparkles, ExternalLink, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from "@/components/ui/Button";
-import { polishArticleAction } from '@/app/actions/polish';
 import { linkKeywords } from '@/lib/utils/linker';
 import { JoinConversation } from './JoinConversation';
-
-const isDev = process.env.NODE_ENV === 'development';
 
 interface ArticleContentProps {
     article: any;
@@ -15,39 +12,10 @@ interface ArticleContentProps {
 
 export async function ArticleContent({ article }: ArticleContentProps) {
     try {
-        const supabase = await createClient();
-
-        // Check if content is too short and needs polishing
-        const contentLength = (article.content?.length || 0);
-        const summaryLength = (article.summary?.length || 0);
-        const totalContentLength = Math.max(contentLength, summaryLength);
-
-        // If content is too short (less than 500 chars), try to expand it
-        if (totalContentLength < 500 && article.url && article.title) {
-            if (isDev) console.log(`[ArticleContent] Content too short (${totalContentLength} chars), triggering AI polish for ${article.id}`);
-
-            try {
-                const polishResult = await polishArticleAction(article.id, article.url, article.title);
-
-                if (polishResult.success) {
-                    // Re-fetch the article with expanded content
-                    const { data: refreshedArticle } = await supabase
-                        .from('articles')
-                        .select('content, summary')
-                        .eq('id', article.id)
-                        .single();
-
-                    if (refreshedArticle) {
-                        article.content = refreshedArticle.content;
-                        article.summary = refreshedArticle.summary;
-                        if (isDev) console.log(`[ArticleContent] Successfully expanded content to ${refreshedArticle.content?.length || 0} chars`);
-                    }
-                }
-            } catch (polishError) {
-                console.error('[ArticleContent] Polish failed:', polishError);
-                // Continue with original short content
-            }
-        }
+        // Note: AI polishing now happens ONLY during ingestion (not at runtime)
+        // This is intentional - runtime polishing is expensive and slow
+        // If an article has short content, it means ingestion didn't polish it
+        // The overnight cron job (/api/cron/repolish) will retry failed articles
 
         // Format content: Convert newlines to paragraphs if it looks like plain text
         let formattedContent = article.content || article.summary || "";

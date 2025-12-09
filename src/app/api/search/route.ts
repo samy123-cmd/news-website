@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { rateLimit, getClientIdentifier, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
+import { CacheHeaders } from '@/lib/cache';
 
 export const revalidate = 300; // Cache for 5 minutes
 
@@ -30,13 +31,21 @@ export async function GET(request: Request) {
 
         if (error) {
             console.error("Search API error:", error);
-            return NextResponse.json([], { status: 200 }); // Return empty array on error
+            return NextResponse.json([], {
+                status: 200,
+                headers: CacheHeaders.NO_CACHE
+            });
         }
 
-        return NextResponse.json(articles || []);
+        return NextResponse.json(articles || [], {
+            headers: CacheHeaders.API_MEDIUM
+        });
     } catch (error) {
         console.error("Search API unexpected error:", error);
-        return NextResponse.json([], { status: 200 });
+        return NextResponse.json([], {
+            status: 200,
+            headers: CacheHeaders.NO_CACHE
+        });
     }
 }
 

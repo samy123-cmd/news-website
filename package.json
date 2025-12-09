@@ -5,10 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:webpack": "next build --webpack",
+    "analyze": "set ANALYZE=true && next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "populate": "npx tsx populate.ts"
+    "populate": "npx tsx scripts/populate.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -49,6 +52,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.8",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -62,8 +66,10 @@
     "baseline-browser-mapping": "^2.9.4",
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
+    "husky": "^9.1.7",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
+    "lint-staged": "^16.2.7",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.5",
     "typescript": "^5"

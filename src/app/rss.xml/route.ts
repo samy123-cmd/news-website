@@ -2,6 +2,15 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+interface RssArticle {
+    id: string;
+    title: string;
+    summary: string;
+    category: string;
+    published_at: string;
+    image_url?: string;
+}
+
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ainews-olive.vercel.app';
 
 export async function GET() {
@@ -19,7 +28,7 @@ export async function GET() {
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 
-    const items = articles?.map((article) => {
+    const items = (articles as RssArticle[] | null)?.map((article: RssArticle) => {
         const link = `${BASE_URL}/article/${article.id}`;
         const category = typeof article.category === 'string' ? article.category : 'General';
 

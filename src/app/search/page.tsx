@@ -69,11 +69,25 @@ async function SearchResults({ query }: { query: string }) {
         );
     }
 
+    // Type assertion for articles array
+    const typedArticles = articles as Array<{
+        id: string;
+        title: string;
+        summary: string;
+        source: string;
+        published_at: string;
+        image_url?: string;
+        category?: string;
+        read_time?: string;
+        url: string;
+    }>;
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article, index) => (
+            {typedArticles.map((article, index) => (
                 <NewsCard key={article.id} article={article} index={index} />
             ))}
         </div>
     );
 }
+

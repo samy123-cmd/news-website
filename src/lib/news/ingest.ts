@@ -3,6 +3,7 @@ import Parser from 'rss-parser';
 import { polishContent } from '@/lib/ai/polisher';
 import { scrapeArticleContent } from '@/lib/ingest';
 import { getImageForCategory, CATEGORY_IMAGES } from '@/lib/constants';
+import { isFeedDisabled, recordFeedSuccess, recordFeedFailure } from '@/lib/news/circuitBreaker';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -96,9 +97,31 @@ export async function ingestNews(limit?: number, category?: string) {
     const selectedFeeds = limit === -1 ? candidateFeeds : candidateFeeds.slice(0, limit || 5);
 
     for (const feedConfig of selectedFeeds) {
+        // Circuit breaker check
+        if (isFeedDisabled(feedConfig.url)) {
+            if (isDev) console.log(`[Ingest] Skipping disabled feed: ${feedConfig.url}`);
+            continue;
+        }
+
         try {
             if (isDev) console.log(`Fetching ${feedConfig.url}...`);
-            const feed = await parser.parseURL(feedConfig.url);
+
+            // Add 30s timeout for feed fetch
+            const feedPromise = parser.parseURL(feedConfig.url);
+            const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('Feed fetch timeout')), 30000)
+            );
+
+            let feed;
+            try {
+                feed = await Promise.race([feedPromise, timeoutPromise]);
+                recordFeedSuccess(feedConfig.url);
+            } catch (e: any) {
+                recordFeedFailure(feedConfig.url);
+                console.warn(`[Ingest] Feed timeout or error: ${feedConfig.url} - ${e.message}`);
+                continue; // Skip this feed
+            }
+
             // If full run (-1), process more items (e.g., 3), otherwise 2
             const itemsToProcess = feed.items.slice(0, limit === -1 ? 3 : 2);
 
@@ -176,6 +199,7 @@ export async function ingestNews(limit?: number, category?: string) {
                     read_time: polished.readTime,
                     tags: polished.tags || [],
                     curation_note: polished.curation_note || null,
+                    ai_processed: (polished as any).ai_processed ?? false,
                 } as any, { onConflict: 'url' })
                     .select()
                     .single();
@@ -184,9 +208,9 @@ export async function ingestNews(limit?: number, category?: string) {
                     results.push({ title: polished.headline, id: inserted.id });
                 }
 
-                // Cooldown removed for Paid Tier
-                // if (isDev) console.log("   ⏳ Cooldown (5s) for API limits...");
-                // await new Promise(resolve => setTimeout(resolve, 5000));
+                // Rate limiting is now handled by rateLimiter.ts
+                // Small delay between DB writes to avoid overwhelming Supabase
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
         } catch (e) {
             console.error(`Error fetching ${feedConfig.url}:`, e);

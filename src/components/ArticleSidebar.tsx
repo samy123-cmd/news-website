@@ -6,6 +6,16 @@ import { formatDistanceToNow } from "date-fns";
 import { AdUnit } from "@/components/AdUnit";
 import { analytics } from "@/lib/analytics";
 
+interface RelatedArticle {
+    id: string;
+    title: string;
+    published_at: string;
+    source: string;
+    image_url?: string;
+    category?: string;
+    views?: number;
+}
+
 interface ArticleSidebarProps {
     currentArticleId: string;
     category: string;
@@ -75,7 +85,7 @@ export async function ArticleSidebar({ currentArticleId, category }: ArticleSide
                     </div>
 
                     <div className="space-y-6">
-                        {relatedArticles?.map((article) => (
+                        {(relatedArticles as RelatedArticle[] | undefined)?.map((article: RelatedArticle) => (
                             <Link key={article.id} href={`/article/${article.id}`} className="group block">
                                 <div className="flex gap-4">
                                     {article.image_url && (
