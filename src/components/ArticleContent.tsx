@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 import sanitizeHtml from 'sanitize-html';
 import { Sparkles, ExternalLink, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
@@ -10,24 +9,67 @@ interface ArticleContentProps {
     article: any;
 }
 
+/**
+ * Formats raw text into readable paragraphs
+ * Handles wall-of-text content that has no structure
+ */
+function formatTextContent(text: string): string {
+    // If already has HTML paragraph tags, return as-is
+    if (text.includes('<p>') || text.includes('<br>') || text.includes('<h')) {
+        return text;
+    }
+
+    // If has double newlines, split on those
+    if (text.includes('\n\n')) {
+        return text
+            .split(/\n\s*\n/)
+            .filter((p: string) => p.trim().length > 0)
+            .map((p: string) => `<p>${p.trim()}</p>`)
+            .join('');
+    }
+
+    // If has single newlines, split on those
+    if (text.includes('\n')) {
+        return text
+            .split(/\n/)
+            .filter((p: string) => p.trim().length > 0)
+            .map((p: string) => `<p>${p.trim()}</p>`)
+            .join('');
+    }
+
+    // Wall of text with no line breaks - split by sentences
+    // Split every 3-4 sentences to create readable paragraphs
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    const paragraphs: string[] = [];
+    let currentParagraph: string[] = [];
+
+    sentences.forEach((sentence, index) => {
+        currentParagraph.push(sentence.trim());
+
+        // Create a new paragraph every 3-4 sentences or at natural breaks
+        const isNaturalBreak = sentence.toLowerCase().includes(' but ') ||
+            sentence.toLowerCase().includes(' however ') ||
+            sentence.toLowerCase().includes(' meanwhile ');
+
+        if (currentParagraph.length >= 3 || isNaturalBreak || index === sentences.length - 1) {
+            if (currentParagraph.length > 0) {
+                paragraphs.push(`<p>${currentParagraph.join(' ')}</p>`);
+                currentParagraph = [];
+            }
+        }
+    });
+
+    return paragraphs.join('');
+}
+
 export async function ArticleContent({ article }: ArticleContentProps) {
     try {
         // Note: AI polishing now happens ONLY during ingestion (not at runtime)
         // This is intentional - runtime polishing is expensive and slow
         // If an article has short content, it means ingestion didn't polish it
-        // The overnight cron job (/api/cron/repolish) will retry failed articles
 
-        // Format content: Convert newlines to paragraphs if it looks like plain text
-        let formattedContent = article.content || article.summary || "";
-
-        // If content doesn't have HTML tags, wrap paragraphs
-        if (!formattedContent.includes('<p>') && !formattedContent.includes('<br>')) {
-            formattedContent = formattedContent
-                .split(/\n\s*\n/)
-                .filter((p: string) => p.trim().length > 0)
-                .map((p: string) => `<p>${p.trim()}</p>`)
-                .join('');
-        }
+        // Format content: Convert raw text to readable paragraphs
+        let formattedContent = formatTextContent(article.content || article.summary || "");
 
         // Apply Contextual Linking (New Feature)
         // We do this before sanitization, but ensuring our linker produces valid HTML that passes sanitization.
