@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Clock, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clock, ExternalLink, Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArticleSidebar } from '@/components/ArticleSidebar';
@@ -12,7 +12,9 @@ import { cn } from '@/lib/utils';
 import ArticleJsonLd from '@/components/seo/ArticleJsonLd';
 import { ArticleContent } from '@/components/ArticleContent';
 import { ArticleActions } from '@/components/ArticleActions';
+
 import { ViewTracker } from '@/components/ViewTracker';
+import { SentimentMeter } from '@/components/SentimentMeter';
 
 // Revalidate article pages every 5 minutes for fresh content
 export const revalidate = 300;
@@ -220,6 +222,23 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 </div>
             </div>
 
+            {/* Curation Note (New Feature) */}
+            {article.curation_note && (
+                <div className="container mx-auto px-4 -mt-8 mb-8 relative z-20">
+                    <div className="max-w-4xl p-4 rounded-xl bg-[#0f172a]/90 border border-indigo-500/30 backdrop-blur-md shadow-2xl">
+                        <div className="flex items-start gap-3">
+                            <div className="p-2 bg-indigo-500/20 rounded-lg shrink-0">
+                                <Sparkles className="w-5 h-5 text-indigo-400" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editor's Take</p>
+                                <p className="text-sm text-gray-200 italic leading-relaxed">"{article.curation_note}"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                     {/* Main Content Column */}
@@ -230,16 +249,38 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         </div>
                     }>
                         <ArticleContent article={article} />
+
+                        {/* Tags Section */}
+                        {article.tags && article.tags.length > 0 && (
+                            <div className="mt-12 pt-8 border-t border-white/10">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Related Topics</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {article.tags.map((tag: string, i: number) => (
+                                        <Link
+                                            key={i}
+                                            href={`/topic/${tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                                            className="px-3 py-1.5 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary-foreground text-sm font-medium transition-colors border border-white/5 hover:border-white/20"
+                                        >
+                                            #{tag}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </Suspense>
 
                     {/* Sidebar Column */}
                     <div className="lg:col-span-4 space-y-8">
-                        <div className="sticky top-24">
+                        <div className="sticky top-24 space-y-8">
+                            {/* Sentiment Meter */}
+                            <SentimentMeter sentiment={article.sentiment} />
+
                             <Suspense fallback={<SidebarSkeleton />}>
                                 <ArticleSidebar currentArticleId={id} category={article.category || 'General'} />
                             </Suspense>
                         </div>
                     </div>
+
                 </div>
             </div>
 

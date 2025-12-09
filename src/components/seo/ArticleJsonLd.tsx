@@ -79,10 +79,12 @@ export default function ArticleJsonLd({ article }: ArticleJsonLdProps) {
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+                suppressHydrationWarning
             />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+                suppressHydrationWarning
             />
         </>
     );

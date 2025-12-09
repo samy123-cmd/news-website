@@ -76,7 +76,7 @@ function getRelatedImages(category: string, mainImage: string): string[] {
 
 export async function ingestNews(limit?: number, category?: string) {
     if (isDev) console.log(`Starting ingestion via API... Limit: ${limit}, Category: ${category || 'All'}`);
-    const results: string[] = [];
+    const results: any[] = [];
 
     // Shuffle feeds
     const shuffledFeeds = [...FEEDS].sort(() => Math.random() - 0.5);
@@ -161,7 +161,7 @@ export async function ingestNews(limit?: number, category?: string) {
 
                 const relatedImages = getRelatedImages(polished.category, imageUrl);
 
-                const { error } = await getSupabase().from('articles').upsert({
+                const { data: inserted, error } = await getSupabase().from('articles').upsert({
                     title: polished.headline,
                     url: item.link,
                     summary: polished.summary,
@@ -174,11 +174,14 @@ export async function ingestNews(limit?: number, category?: string) {
                     images: relatedImages,
                     sentiment: polished.sentiment,
                     read_time: polished.readTime,
-                    // status: 'published' - relying on DB default
-                } as any, { onConflict: 'url' });
+                    tags: polished.tags || [],
+                    curation_note: polished.curation_note || null,
+                } as any, { onConflict: 'url' })
+                    .select()
+                    .single();
 
-                if (!error) {
-                    results.push(polished.headline);
+                if (!error && inserted) {
+                    results.push({ title: polished.headline, id: inserted.id });
                 }
 
                 // Cooldown removed for Paid Tier
@@ -190,5 +193,42 @@ export async function ingestNews(limit?: number, category?: string) {
         }
     }
 
-    return results;
+    // IndexNow Notification (SEO)
+    if (results.length > 0 && process.env.NEXT_PUBLIC_SITE_URL && !isDev) {
+        try {
+            const indexNowKey = "83a7c64a5e3f4d2b9a7c64a5e3f4d2b9";
+            const host = new URL(process.env.NEXT_PUBLIC_SITE_URL).hostname;
+            const protocol = new URL(process.env.NEXT_PUBLIC_SITE_URL).protocol; // 'https:'
+
+            // Construct absolute URLs using the ID
+            const urlList = results.map(r => `${protocol}//${host}/article/${r.id}`);
+
+            if (urlList.length > 0) {
+                if (isDev) {
+                    console.log("[IndexNow dev-mode] Would ping for:", urlList.length, "urls");
+                } else {
+                    console.log(`[IndexNow] Pinging Bing for ${urlList.length} new articles...`);
+                    // We don't await this strictly to fail the ingestion, but useful to see logs
+                    await fetch("https://api.indexnow.org/indexnow", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json; charset=utf-8" },
+                        body: JSON.stringify({
+                            host: host,
+                            key: indexNowKey,
+                            keyLocation: `${protocol}//${host}/${indexNowKey}.txt`,
+                            urlList: urlList
+                        })
+                    }).then(res => {
+                        if (res.ok) console.log("[IndexNow] Ping sent successfully.");
+                        else console.error("[IndexNow] Failed:", res.status, res.statusText);
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("IndexNow Error:", e);
+        }
+    }
+
+    // Map back to strings for backward compatibility
+    return results.map(r => r.title);
 }

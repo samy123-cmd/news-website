@@ -9,11 +9,12 @@ import { LoadMore } from "@/components/LoadMore";
 interface NewsFeedProps {
     category?: string;
     subcategory?: string;
+    tag?: string;
     limit?: number;
     initialArticles?: any[];
 }
 
-export async function NewsFeed({ category, subcategory, limit = 20, initialArticles }: NewsFeedProps) {
+export async function NewsFeed({ category, subcategory, tag, limit = 20, initialArticles }: NewsFeedProps) {
     const supabase = await createClient();
 
     let rawArticles = initialArticles;
@@ -31,6 +32,10 @@ export async function NewsFeed({ category, subcategory, limit = 20, initialArtic
 
         if (subcategory && subcategory !== "All") {
             query = query.eq("subcategory", subcategory);
+        }
+
+        if (tag) {
+            query = query.contains("tags", [tag]);
         }
 
         const { data, error } = await query;

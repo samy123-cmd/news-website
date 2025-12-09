@@ -8,6 +8,8 @@ interface PolishedContent {
     subcategory: string;
     sentiment: 'positive' | 'neutral' | 'negative';
     readTime: string;
+    tags?: string[];
+    curation_note?: string;
 }
 
 export async function polishContent(text: string, originalHeadline: string): Promise<PolishedContent> {
@@ -20,7 +22,9 @@ export async function polishContent(text: string, originalHeadline: string): Pro
             category: "General",
             subcategory: "News",
             sentiment: "neutral",
-            readTime: "1 min"
+            readTime: "1 min",
+            tags: [],
+            curation_note: "Content gathered from raw feed."
         };
     }
 
@@ -28,10 +32,9 @@ export async function polishContent(text: string, originalHeadline: string): Pro
 
     // List of models to try in order of preference
     const modelsToTry = [
-        "gemini-1.5-flash-001",
         "gemini-1.5-flash",
-        "gemini-pro",
-        "gemini-1.0-pro"
+        "gemini-1.5-flash-001",
+        "gemini-1.5-flash-8b"
     ];
 
     let lastError;
@@ -62,6 +65,8 @@ export async function polishContent(text: string, originalHeadline: string): Pro
                     3. Write Article (400-600 words, HTML format <h3>, <p>, <ul>)
                     4. Category: [World, Politics, Business, Technology, Sports, Entertainment, Science, Opinion, India]
                     5. Subcategory, Sentiment, ReadTime.
+                    6. Tags: Array of 3-5 specific entities (e.g. ["Nvidia", "Jensen Huang", "AI Chips"])
+                    7. Curation Note: A 1-sentence explanation of why this story matters (e.g. "Selected because valid regulatory approval significantly impacts the AI hardware market.")
 
                     Output JSON ONLY.
                     `;
@@ -147,6 +152,8 @@ export async function polishContent(text: string, originalHeadline: string): Pro
         category: "General",
         subcategory: "News",
         sentiment: "neutral",
-        readTime: "1 min"
+        readTime: "1 min",
+        tags: [],
+        curation_note: "AI service unavailable."
     };
 }

@@ -33,13 +33,13 @@ export async function subscribeToNewsletter(formData: FormData) {
 export async function getLatestNews(category: string, limit: number = 20) {
     const supabase = await createClient();
 
-    // 1. Try to fetch fresh news from DB (e.g., last 30 minutes)
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+    // 1. Try to fetch fresh news from DB (e.g., last 24 hours)
+    const timeWindow = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     let query = supabase
         .from('articles')
         .select('*')
-        .gt('published_at', thirtyMinutesAgo)
+        .gt('published_at', timeWindow)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
         .limit(limit);

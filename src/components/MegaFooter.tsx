@@ -2,6 +2,7 @@
 
 import { Facebook, Twitter, Instagram, Linkedin, Mail } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { SubscriptionForm } from "./SubscriptionForm";
 
 export function MegaFooter() {
     return (
@@ -68,21 +69,11 @@ export function MegaFooter() {
 
                     {/* Newsletter Column */}
                     <div className="space-y-6">
-                        <h3 className="font-heading font-bold text-lg text-white">Subscribe to our Newsletter</h3>
+                        <h3 className="font-heading font-bold text-lg text-white">Get the Daily AI Brief</h3>
                         <p className="text-sm text-muted-foreground">
-                            Get the latest headlines and AI-summarized briefs delivered to your inbox daily.
+                            5-minute AI-curated briefing of the top 5 stories. Join 25k+ professionals.
                         </p>
-                        <div className="flex gap-2">
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                className="flex-1 bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary/50"
-                            />
-                            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-bold">
-                                <Mail className="w-4 h-4 mr-2" />
-                                Subscribe
-                            </Button>
-                        </div>
+                        <SubscriptionForm />
                     </div>
                 </div>
 

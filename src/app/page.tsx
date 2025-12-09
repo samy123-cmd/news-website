@@ -80,6 +80,19 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div className="bg-background min-h-screen">
+
+      {/* 1. SEO H1 Logic */}
+      {category === "All" ? (
+        <h1 className="sr-only">Global AI News - Real-time AI Curated Headlines</h1>
+      ) : (
+        <div className="container mx-auto px-4 pt-32 pb-4">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground relative inline-block">
+            {category} News
+            <span className="absolute -bottom-2 left-0 w-1/3 h-1.5 bg-primary rounded-full" />
+          </h1>
+        </div>
+      )}
+
       {/* Hero Section (Only show on Home/All) */}
       {category === "All" && (
         <div className="container mx-auto px-4 pt-6 pb-8">
@@ -88,10 +101,6 @@ export default async function Home({ searchParams }: HomeProps) {
           </Suspense>
         </div>
       )}
-
-
-
-
 
       {/* Trending Bar */}
       <div className="mt-16 relative z-10">
@@ -109,7 +118,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <section>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-heading font-bold text-foreground relative inline-block">
-                {category === "All" ? "Latest Headlines" : category}
+                {category === "All" ? "Latest Headlines" : "More Stories"}
                 <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full" />
               </h2>
               {category === "All" && (
@@ -127,8 +136,6 @@ export default async function Home({ searchParams }: HomeProps) {
               <NewsFeed category={category} subcategory={subcategory} limit={category === "All" ? 20 : 20} initialArticles={initialArticles} />
             </Suspense>
           </section>
-
-
 
         </div>
 

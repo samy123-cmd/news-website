@@ -155,7 +155,7 @@ export function NewsCard({ article, index = 0 }: { article: Article; index?: num
                         <span className="text-primary uppercase tracking-wider font-bold">{article.category || "General"}</span>
                         <span className="text-white/20">•</span>
                         {timeStatus === 'breaking' && (
-                            <span className="flex items-center gap-1 text-red-500 font-bold animate-pulse">
+                            <span className="flex items-center gap-1 text-rose-500 font-bold animate-pulse">
                                 <Zap className="w-3 h-3 fill-current" />
                                 Breaking
                             </span>

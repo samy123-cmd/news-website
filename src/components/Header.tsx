@@ -174,7 +174,11 @@ export function Header() {
 
 
 
-                        <Button size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(30,167,255,0.3)] hover:shadow-[0_0_25px_rgba(30,167,255,0.5)] rounded-full px-5 h-9 text-xs font-bold uppercase tracking-widest relative overflow-hidden group transition-all duration-300 transform hover:-translate-y-0.5">
+                        <Button
+                            size="sm"
+                            className="bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(30,167,255,0.3)] hover:shadow-[0_0_25px_rgba(30,167,255,0.5)] rounded-full px-5 h-9 text-xs font-bold uppercase tracking-widest relative overflow-hidden group transition-all duration-300 transform hover:-translate-y-0.5"
+                            onClick={() => document.querySelector('footer')?.scrollIntoView({ behavior: 'smooth' })}
+                        >
                             <span className="relative z-10">Subscribe</span>
                         </Button>
                         <ThemeToggle />
@@ -273,7 +277,15 @@ export function Header() {
                                 >
                                     Submit Article
                                 </Link>
-                                <Button className="w-full justify-center h-12 bg-primary text-white font-bold shadow-lg shadow-primary/20">Subscribe Now</Button>
+                                <Button
+                                    className="w-full justify-center h-12 bg-primary text-white font-bold shadow-lg shadow-primary/20"
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        document.querySelector('footer')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                >
+                                    Subscribe Now
+                                </Button>
                             </div>
                         </nav>
                     </motion.div>

@@ -4,6 +4,8 @@ import { Sparkles, ExternalLink, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from "@/components/ui/Button";
 import { polishArticleAction } from '@/app/actions/polish';
+import { linkKeywords } from '@/lib/utils/linker';
+import { JoinConversation } from './JoinConversation';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -58,6 +60,10 @@ export async function ArticleContent({ article }: ArticleContentProps) {
                 .map((p: string) => `<p>${p.trim()}</p>`)
                 .join('');
         }
+
+        // Apply Contextual Linking (New Feature)
+        // We do this before sanitization, but ensuring our linker produces valid HTML that passes sanitization.
+        formattedContent = linkKeywords(formattedContent);
 
         const cleanContent = sanitizeHtml(formattedContent, {
             allowedTags: [
@@ -151,8 +157,10 @@ export async function ArticleContent({ article }: ArticleContentProps) {
 
                 {/* Inline Ad Placeholder (Monetization) */}
                 <div className="my-12 flex justify-center">
-                    <div className="w-full max-w-[728px] h-[90px] bg-white/5 border border-white/5 rounded-lg flex items-center justify-center relative overflow-hidden">
-                        <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Advertisement</span>
+                    <div className="w-full max-w-[728px] h-[90px] bg-[#0b1624] border border-white/10 rounded-lg flex items-center justify-center relative overflow-hidden group">
+                        {/* CSS Pattern Background */}
+                        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
+                        <span className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] z-10">Advertisement Space</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
                     </div>
                 </div>
@@ -182,14 +190,7 @@ export async function ArticleContent({ article }: ArticleContentProps) {
                 )}
 
                 {/* Comments / Engagement Placeholder */}
-                <div className="mt-16 p-8 bg-white/5 rounded-2xl border border-white/10 text-center">
-                    <MessageSquare className="w-8 h-8 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">Join the Conversation</h3>
-                    <p className="text-muted-foreground mb-6">Subscribe to our newsletter for daily updates.</p>
-                    <Button className="inline-flex items-center justify-center h-10 px-6 rounded-full bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
-                        Subscribe
-                    </Button>
-                </div>
+                <JoinConversation />
             </div>
         );
     } catch (error) {
