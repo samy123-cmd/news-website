@@ -40,7 +40,7 @@ const FEEDS = [
     { url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'World' },
     // India
     { url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms', category: 'India' },
-    { url: 'https://www.ndtv.com/rss/top-stories', category: 'India' },
+    // { url: 'https://www.ndtv.com/rss/top-stories', category: 'India' }, // Temp blocked (403)
     { url: 'https://www.thehindu.com/news/national/feeder/default.rss', category: 'India' },
     // Business
     { url: 'http://feeds.bbci.co.uk/news/business/rss.xml', category: 'Business' },

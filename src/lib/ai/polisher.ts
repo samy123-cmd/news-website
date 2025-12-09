@@ -26,7 +26,7 @@ export async function polishContent(text: string, originalHeadline: string): Pro
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-1.5-flash-001",
         generationConfig: { responseMimeType: "application/json" }
     });
 
