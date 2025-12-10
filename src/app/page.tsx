@@ -27,6 +27,18 @@ export async function generateMetadata({ searchParams }: HomeProps): Promise<Met
     ? "Global AI News | Real-time AI-curated News"
     : `${category} News | Global AI News`;
 
+  // Pre-fetch hero image for LCP hint via OG (browsers often discover this early)
+  let heroImage = null;
+  if (category === "All") {
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.from("articles").select("image_url").not("image_url", "is", null).order("published_at", { ascending: false }).limit(1).single();
+      heroImage = data?.image_url;
+    } catch (e) {
+      // Ignore
+    }
+  }
+
   return {
     title,
     description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real - time.`,
@@ -34,19 +46,26 @@ export async function generateMetadata({ searchParams }: HomeProps): Promise<Met
       title,
       description: `Stay updated with the latest ${category === "All" ? "global" : category} news, curated by AI in real - time.`,
       type: 'website',
+      images: heroImage ? [{ url: heroImage }] : [],
     },
   };
 }
 
+import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
 export default async function Home({ searchParams }: HomeProps) {
   const { category = "All", subcategory = "All" } = await searchParams;
 
   // Fetch news based on category
-  let initialArticles = [];
+  let initialArticles: any[] = [];
+  let featuredArticle: any = null;
+  let quickReadsArticles: any[] = []; // Fixed variable name to match usage
+
+  const supabase = await createClient();
+
   if (category === "All") {
-    // Check for user preferences
+    // Parallelize detailed fetches only for Home
     const cookieStore = await cookies();
     const userCategoriesCookie = cookieStore.get("user_categories");
     let userCategories: string[] = [];
@@ -59,14 +78,27 @@ export default async function Home({ searchParams }: HomeProps) {
       }
     }
 
+    // 1. Fetch Hero Data (Hoisted for LCP)
+    const [featuredResult, quickReadsResult] = await Promise.all([
+      supabase.from("articles").select("*").not("image_url", "is", null).order("published_at", { ascending: false }).limit(1).single(),
+      supabase.from("articles").select("id, title, source, published_at, url").order("published_at", { ascending: false }).limit(6)
+    ]);
+
+    featuredArticle = featuredResult.data;
+    let quickReadsRaw = (quickReadsResult.data || []) as any[];
+
+    if (featuredArticle) {
+      quickReadsArticles = quickReadsRaw.filter((a: any) => a.id !== featuredArticle.id).slice(0, 5);
+    } else {
+      quickReadsArticles = quickReadsRaw.slice(0, 5);
+    }
+
+    // 2. Fetch Feed Data
     if (userCategories.length > 0) {
-      // Fetch news for selected categories
-      // We'll fetch top 2 from each selected category to build a personalized feed
       const promises = userCategories.map(cat => getLatestNews(cat.toLowerCase(), 6));
       const results = await Promise.all(promises);
       initialArticles = results.flat().sort((a: any, b: any) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
     } else {
-      // Default mix if no preferences
       const [politics, tech, sports] = await Promise.all([
         getLatestNews('politics', 6),
         getLatestNews('technology', 6),
@@ -93,12 +125,10 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       )}
 
-      {/* Hero Section (Only show on Home/All) */}
-      {category === "All" && (
+      {/* Hero Section (Only show on Home/All) - Suspense removed for LCP */}
+      {category === "All" && featuredArticle && (
         <div className="container mx-auto px-4 pt-6 pb-8">
-          <Suspense fallback={<HeroSkeleton />}>
-            <HeroSection />
-          </Suspense>
+          <HeroSection featuredArticle={featuredArticle} quickReadsArticles={quickReadsArticles} />
         </div>
       )}
 

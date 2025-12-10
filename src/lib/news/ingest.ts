@@ -300,7 +300,7 @@ export async function ingestNews(options: IngestOptions = {}): Promise<IngestSta
     // -------------------------------------------------------------------------
     // We limit concurrency to avoid hitting Gemini Rate Limits (e.g. 15 RPM).
     // A concurrency of 5 with ~5s-10s per generation fits well.
-    const CONCURRENCY = 5;
+    const CONCURRENCY = 2;
     const processedArticles: any[] = [];
 
     const processItem = async (candidate: RawItem) => {
@@ -424,9 +424,11 @@ export async function ingestNews(options: IngestOptions = {}): Promise<IngestSta
     if (processedArticles.length > 0) {
         try {
             const { error: insertError } = await dbRetry(async () => {
+                // Remove non-schema fields before inserting
+                const minimalArticles = processedArticles.map(({ is_fallback, ...rest }: any) => rest);
                 return await getSupabase()
                     .from('articles')
-                    .upsert(processedArticles, { onConflict: 'url' });
+                    .upsert(minimalArticles, { onConflict: 'url' });
             });
 
             if (insertError) {

@@ -12,7 +12,11 @@ export function ThemeToggle() {
         <Button
             variant="ghost"
             size="icon"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            onClick={() => {
+                React.startTransition(() => {
+                    setTheme(theme === "light" ? "dark" : "light");
+                });
+            }}
             className="rounded-full w-10 h-10 bg-white/5 hover:bg-white/10 text-foreground transition-colors"
             aria-label="Toggle theme"
         >

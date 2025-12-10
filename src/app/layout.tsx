@@ -12,6 +12,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AdSenseScript } from "@/components/monetization/AdSenseScript";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -114,6 +115,7 @@ export default function RootLayout({
         className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${notoSansDevanagari.variable} font-sans antialiased bg-background text-foreground overflow-x-hidden`}
         suppressHydrationWarning
       >
+        <AdSenseScript />
         <JsonLd />
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
           <LanguageProvider>
