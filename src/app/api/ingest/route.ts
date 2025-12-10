@@ -15,12 +15,16 @@ export async function GET(request: Request) {
     try {
         const isFull = searchParams.get('full') === 'true';
         const category = searchParams.get('category') || undefined;
-        const newsResults = await ingestNews(isFull ? -1 : undefined, category);
+        const newsResults = await ingestNews({
+            limit: isFull ? -1 : undefined, // -1 means all
+            category: category
+        });
 
         return NextResponse.json({
             success: true,
-            count: newsResults.length,
-            articles: newsResults
+            summary: `Run complete in ${newsResults.durationMs}ms`,
+            count: newsResults.articlesProcessed,
+            details: newsResults
         });
     } catch (error) {
         console.error("Ingest API Error:", error);

@@ -52,6 +52,14 @@ export const metadata: Metadata = {
   description: "Experience the future of news. Real-time, AI-curated journalism from verified global sources. Unbiased, comprehensive, and premium.",
   keywords: ["AI News", "Global News", "Tech News", "World News", "Artificial Intelligence", "Journalism", "Verified News", "Premium News"],
   authors: [{ name: "Global AI News Team" }],
+  // Search engine verification tags
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || "",
+    yandex: process.env.YANDEX_VERIFICATION || "",
+    other: {
+      "msvalidate.01": process.env.BING_SITE_VERIFICATION || "",
+    },
+  },
   openGraph: {
     title: "Global AI News | The Future of Journalism",
     description: "Real-time, AI-curated journalism from verified global sources. Unbiased, comprehensive, and premium.",

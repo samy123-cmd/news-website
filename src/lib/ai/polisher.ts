@@ -13,6 +13,7 @@ interface PolishedContent {
     tags?: string[];
     curation_note?: string;
     ai_processed?: boolean;
+    is_fallback?: boolean; // Track if fallback was used
 }
 
 // Fallback response when AI is unavailable
@@ -20,14 +21,15 @@ function createFallbackResponse(text: string, originalHeadline: string, reason: 
     return {
         headline: originalHeadline,
         summary: text.substring(0, 200) + "...",
-        content: `<p>${text}</p>`,
+        content: `<p>${text}</p>`, // Ensure <p> wrapper for consistency
         category: "General",
         subcategory: "News",
         sentiment: "neutral",
         readTime: "1 min",
         tags: [],
-        curation_note: null as any, // Null = hide section in UI
-        ai_processed: false
+        curation_note: null as any,
+        ai_processed: false,
+        is_fallback: true
     };
 }
 
@@ -148,11 +150,9 @@ IMPORTANT:
                     const isRateLimit = error.message?.includes('429') || error.status === 429;
 
                     if (isRateLimit) {
-                        attempt++;
-                        if (attempt < MAX_RETRIES) {
-                            await waitForBackoff();
-                            continue;
-                        }
+                        console.warn(`[Content Polisher] Rate limit hit for "${originalHeadline}". Returning fallback to save time.`);
+                        // Break the retry loop and drop to fallback
+                        break;
                     }
 
                     // 404 = try next model
