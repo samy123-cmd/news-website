@@ -59,6 +59,7 @@ export const metadata: Metadata = {
     yandex: process.env.YANDEX_VERIFICATION || "",
     other: {
       "msvalidate.01": process.env.BING_SITE_VERIFICATION || "",
+      "google-adsense-account": "ca-pub-3766621537317806",
     },
   },
   openGraph: {
